@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ClientGUI">
+  <grid id="d2d7c" binding="mainPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="55682" binding="panneauTop" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="3c03b" class="javax.swing.JLabel" binding="messageTop">
+            <constraints border-constraint="North"/>
+            <properties>
+              <font name="Arial Unicode MS" size="14" style="1"/>
+              <text value="Vous n'êtes pas connecté."/>
+              <verticalAlignment value="0"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="20b9d" binding="panneauBot" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="d240f" class="javax.swing.JTextField" binding="mTexteMessageChat">
+            <constraints border-constraint="Center"/>
+            <properties/>
+          </component>
+          <component id="d7776" class="javax.swing.JButton" binding="mButtonConnectionServer">
+            <constraints border-constraint="South"/>
+            <properties>
+              <text value="Se connecter"/>
+              <toolTipText value="Lance la connection au serveur"/>
+            </properties>
+          </component>
+          <component id="6e93e" class="javax.swing.JButton" binding="mButtonEnvoyerMessage">
+            <constraints border-constraint="East"/>
+            <properties>
+              <text value="Envoyer message"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="735a6" binding="panneauCentral" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="f68d" class="javax.swing.JTextArea" binding="mTextAreaChat">
+            <constraints border-constraint="West"/>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="a98be" class="javax.swing.JList" binding="mJListJoueurs" custom-create="true">
+            <constraints border-constraint="East"/>
+            <properties/>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

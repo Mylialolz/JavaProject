@@ -7,29 +7,18 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Created by Antoine on 04/11/2016.
  */
-public class Client implements ActionListener, Runnable {
+public class ClientGUI implements Runnable {
 
 
-    private JPanel panneauPrincipal;
-    private JPanel panneauCentral;
-    private JButton lancerRequete;
-    private JTextArea chat;
-    private JFrame mainFrame;
-    private JLabel messageTop;
-    private JButton boutonConnexion;
+    private JPanel panneauBot;
 
-    private JTextField mWriteMessage;
-
-    private JList mListPlayers;
     //private ArrayList<Joueur> mArrayPlayers;
-    private DefaultListModel listPlayers;
+    private DefaultListModel mDefaultlistPlayers;
 
     private final String mIp;
     private final int mPort;
@@ -39,75 +28,46 @@ public class Client implements ActionListener, Runnable {
     private boolean mConnected;
     private Thread mThread;
 
-
     DataInputStream in;
     DataOutputStream out;
     ObjectInputStream input;
 
-    public Client(String ip, int port, String pseudo) {
+    private JLabel messageTop;
+    private JPanel panneauTop;
+    private JPanel panneauCentral;
+    private JTextField mTexteMessageChat;
+    private JButton mButtonConnectionServer;
+    private JButton mButtonEnvoyerMessage;
+    private JTextArea mTextAreaChat;
+    private JPanel mainPanel;
+    private JList mJListJoueurs;
+
+    public ClientGUI(String ip, int port, String pseudo) {
         mIp = ip;
         mPort = port;
         mConnected = false;
         mPseudo = pseudo;
-
         mThread = new Thread(this);
-        this.prepareGUI();
-    }
 
-    private void prepareGUI() {
-
-        mainFrame = new JFrame("MEME ENJAIL"); //Création d'une fenêtre avec un titre
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+        mButtonEnvoyerMessage.addActionListener(new ActionListener() {
             @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                if (JOptionPane.showConfirmDialog(mainFrame,
-                        "Are you sure to close this window?", "Really Closing?",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                    if (mConnected)
-                        disconnect();
-                    System.exit(0);
-                }
+            public void actionPerformed(ActionEvent e) {
+               envoyerMessageChat(mTexteMessageChat.getText());
+                mTexteMessageChat.setText("");
+            }
+        });
+        mButtonConnectionServer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                connect();
             }
         });
 
-        panneauPrincipal = new JPanel(new BorderLayout()); //Création d'un panneau avec disposition selon BorderLayout
 
-        boutonConnexion = new JButton("Se connecter");
-        panneauPrincipal.add(boutonConnexion, BorderLayout.PAGE_END);
-        boutonConnexion.addActionListener(this);
+    }
 
-        listPlayers = new DefaultListModel();
-        mListPlayers = new JList(listPlayers);
-        panneauPrincipal.add(mListPlayers, BorderLayout.EAST);
-
-        messageTop = new JLabel("Vous n'êtes pas connecté.");
-        panneauPrincipal.add(messageTop, BorderLayout.PAGE_START);
-
-
-        panneauCentral = new JPanel(new BorderLayout());
-        mWriteMessage = new JTextField();
-        mWriteMessage.setColumns(50);
-        panneauCentral.add(mWriteMessage, BorderLayout.PAGE_END);
-        lancerRequete = new JButton("Envoyer message");
-        lancerRequete.addActionListener(this);
-        panneauCentral.add(lancerRequete, BorderLayout.EAST);
-        chat = new JTextArea();
-        chat.setColumns(200);
-        chat.setEditable(false);
-        panneauCentral.add(chat, BorderLayout.WEST);
-
-        panneauPrincipal.add(panneauCentral, BorderLayout.CENTER);
-
-
-
-        //Finitions
-        mainFrame.setContentPane(panneauPrincipal); //On range le panneau dans la fenêtre
-        mainFrame.pack();
-        mainFrame.setVisible(true);
-
+    public JPanel getMainPanel(){
+        return mainPanel;
     }
 
 
@@ -130,6 +90,8 @@ public class Client implements ActionListener, Runnable {
 
                     mThread.start();
 
+                    mButtonConnectionServer.setEnabled(false);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -145,39 +107,37 @@ public class Client implements ActionListener, Runnable {
 
     private void setPlayersList() throws IOException, ClassNotFoundException {
 
-        listPlayers.removeAllElements();
+        mDefaultlistPlayers.removeAllElements();
 
         ArrayList<Joueur> arrayPlayers =(ArrayList<Joueur>) input.readObject();
         System.out.println("size : " + arrayPlayers.size());
 
         for (Joueur e : arrayPlayers) {
-            listPlayers.addElement(e.getPseudo());
+            mDefaultlistPlayers.addElement(e.getPseudo());
         }
 
     }
 
-
     public int disconnect() {
         try {
-            System.out.println("Disconnecting...");
 
-            out.writeUTF(CONSTANTE.CLIENT_SERVER_STOP);
-            out.writeUTF("stop");
+            if(mConnected) {
+                System.out.println("Disconnecting...");
+                out.writeUTF(CONSTANTE.CLIENT_SERVER_STOP);
+                out.writeUTF("stop");
+                in.close();
+                input.close();
+                out.close();
+                mSocket.close();
 
-
-            in.close();
-            input.close();
-            out.close();
-            mSocket.close();
-
-
+                mButtonConnectionServer.setEnabled(true);
+            }
             return 0;
         } catch (IOException e) {
             e.printStackTrace();
             return 1;
         }
     }
-
 
     public int sendMeme(Socket socket, String chemin) {
 
@@ -193,21 +153,6 @@ public class Client implements ActionListener, Runnable {
     }
 
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object source = e.getSource();
-
-        if (source == boutonConnexion) {
-            this.connect();
-        }
-
-        if(source == lancerRequete){
-            this.envoyerMessageChat(mWriteMessage.getText());
-        }
-
-    }
-
-
     public void envoyerMessageChat(String message){
 
         if(mConnected) {
@@ -218,13 +163,13 @@ public class Client implements ActionListener, Runnable {
                 out.writeUTF(CONSTANTE.CLIENT_SERVER_CHAT);
                 out.writeUTF(message);
 
-                String pText = chat.getText();
+                String pText = mTextAreaChat.getText();
 
                 if(pText.matches("")) {
-                    chat.setText(mPseudo + ": " + message + "\n");
+                    mTextAreaChat.setText(mPseudo + ": " + message + "\n");
                 }
                 else {
-                    chat.setText(pText + "\n" + mPseudo + ": " + message);
+                    mTextAreaChat.setText(pText + "\n" + mPseudo + ": " + message);
                 }
 
 
@@ -241,13 +186,13 @@ public class Client implements ActionListener, Runnable {
         String data = null;
         try {
             data = in.readUTF();
-            String p = chat.getText();
+            String p = mTexteMessageChat.getText();
 
             if(p.matches("")){
-                chat.setText(data);
+                mTexteMessageChat.setText(data);
             }
             else {
-                chat.setText(p + "\n" + data);
+                mTexteMessageChat.setText(p + "\n" + data);
             }
 
         } catch (IOException e) {
@@ -298,5 +243,11 @@ public class Client implements ActionListener, Runnable {
             }
         }
 
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+        mDefaultlistPlayers = new DefaultListModel();
+        mJListJoueurs = new JList(mDefaultlistPlayers);
     }
 }
