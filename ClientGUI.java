@@ -15,10 +15,14 @@ import java.util.ArrayList;
 public class ClientGUI implements Runnable {
 
 
+    private final static int GUEST = 0;
+    private final static int MASTER = 1;
+
     private JPanel panneauBot;
 
     //private ArrayList<Joueur> mArrayPlayers;
     private DefaultListModel mDefaultlistPlayers;
+    private DefaultListModel mDefaultlistSalle;
 
     private final String mIp;
     private final int mPort;
@@ -41,6 +45,15 @@ public class ClientGUI implements Runnable {
     private JTextArea mTextAreaChat;
     private JPanel mainPanel;
     private JList mJListJoueurs;
+    private JList mJListSalle;
+    private JLabel mLabelNbAudience;
+    private JButton mButtonAccessGamePlayer;
+    private JButton mButtonAccessGameAudience;
+    private JLabel mLabelIndicatifSalleRole;
+    private JLabel mJLabelScore;
+    private JLabel mLabelNbRoundRestants;
+    private JButton mButtonQuitterPartie;
+    private JList mJListSalleJeu;
 
     public ClientGUI(String ip, int port, String pseudo) {
         mIp = ip;
@@ -56,10 +69,25 @@ public class ClientGUI implements Runnable {
                 mTexteMessageChat.setText("");
             }
         });
+
         mButtonConnectionServer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 connect();
+            }
+        });
+
+        mButtonAccessGamePlayer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                trouverSalleJeu(MASTER);
+            }
+        });
+
+        mButtonAccessGamePlayer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                trouverSalleJeu(GUEST);
             }
         });
 
@@ -69,7 +97,6 @@ public class ClientGUI implements Runnable {
     public JPanel getMainPanel(){
         return mainPanel;
     }
-
 
     public void connect() {
         try {
@@ -152,10 +179,9 @@ public class ClientGUI implements Runnable {
         }
     }
 
-
     public void envoyerMessageChat(String message){
 
-        if(mConnected) {
+        if(mConnected && !message.matches("")) {
             try {
 
                 System.out.println("Envoi message dans le chat...");
@@ -180,19 +206,18 @@ public class ClientGUI implements Runnable {
 
     }
 
-
     public void setChat(){
 
         String data = null;
         try {
             data = in.readUTF();
-            String p = mTexteMessageChat.getText();
+            String p = mTextAreaChat.getText();
 
             if(p.matches("")){
-                mTexteMessageChat.setText(data);
+                mTextAreaChat.setText(data);
             }
             else {
-                mTexteMessageChat.setText(p + "\n" + data);
+                mTextAreaChat.setText(p + "\n" + data);
             }
 
         } catch (IOException e) {
@@ -200,7 +225,9 @@ public class ClientGUI implements Runnable {
         }
     }
 
-
+    public void trouverSalleJeu(int code){
+        return;
+    }
 
     @Override
     public void run() {
@@ -249,5 +276,9 @@ public class ClientGUI implements Runnable {
         // TODO: place custom component creation code here
         mDefaultlistPlayers = new DefaultListModel();
         mJListJoueurs = new JList(mDefaultlistPlayers);
+        mDefaultlistSalle = new DefaultListModel();
+        mJListSalle = new JList(mDefaultlistSalle);
+        mDefaultlistSalle.addElement("Aucune salle de jeu");
+        mDefaultlistPlayers.addElement("Aucun joueurs connectés");
     }
 }

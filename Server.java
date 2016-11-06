@@ -16,18 +16,20 @@ public class Server {
     public static final int NEW_CHAT_MESSAGE = 2;
 
     private ServerSocket mServerSocket;
-    private int mCodeStopServeur;
+    private int mCodeStopServeur = 0;
     private ArrayList<Socket> mListClient;
     private ArrayList<Joueur> mListJoueurs;
     private ArrayList<ClientManager> mManagers;
 
+    private SalleJeu mSalleJeu;
+
     private int compteur = 0;
 
     public Server(){
-        mCodeStopServeur = 0;
         mListClient = new ArrayList<>();
         mListJoueurs = new ArrayList<>();
         mManagers = new ArrayList<>();
+        mSalleJeu = new SalleJeu();
     }
 
     private int lancerServeur(int port){

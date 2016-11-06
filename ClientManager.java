@@ -62,7 +62,6 @@ public class ClientManager implements Runnable {
         try {
 
             out.writeUTF(CONSTANTE.NOUVELLE_LISTE);
-            //System.out.println(mServeur.getListJoueurs().size());
             ArrayList<Joueur> list = (ArrayList<Joueur>)mServeur.getListJoueurs().clone();
             oos.writeObject(list);
 
@@ -118,7 +117,9 @@ public class ClientManager implements Runnable {
                     mServeur.newMessage(message, mId);
                     break;
 
-
+                case CONSTANTE.CLIENT_SERVER_SALLE_JEU :
+                    // ajouter code ici
+                    break;
             }
 
         } catch (java.net.SocketException se) {

@@ -15,6 +15,8 @@ public class CONSTANTE {
 
     public final static String CLIENT_SERVER_CHAT = "CHAT";
 
+    public final static String CLIENT_SERVER_SALLE_JEU = "SALLE_JEU";
+
 
 
 }
