@@ -82,6 +82,8 @@ public class Server {
 
     synchronized public ArrayList<ClientManager> getListManagers(){return mManagers;}
 
+    synchronized public SalleJeu getJeu() { return mSalleJeu; }
+
 
     synchronized public void newPlayer(){
         for(ClientManager cm : mManagers){
@@ -94,6 +96,13 @@ public class Server {
         for(ClientManager cm : mManagers){
             cm.distribuerMessageChat(s, id);
         }
+    }
+
+    synchronized public void newMemberInGame(){
+        for(ClientManager cm : mManagers){
+            cm.updateCountersOfAudienceAndPlayersInGame();
+        }
+        mSalleJeu.lancerPartie();
     }
 
 

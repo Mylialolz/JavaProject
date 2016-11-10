@@ -15,14 +15,14 @@ import java.util.ArrayList;
 public class ClientGUI implements Runnable {
 
 
-    private final static int GUEST = 0;
-    private final static int MASTER = 1;
+    public final static int GUEST = 0;
+    public final static int MASTER = 1;
 
     private JPanel panneauBot;
 
     //private ArrayList<Joueur> mArrayPlayers;
     private DefaultListModel mDefaultlistPlayers;
-    private DefaultListModel mDefaultlistSalle;
+    private DefaultListModel mDefaultlistScore;
 
     private final String mIp;
     private final int mPort;
@@ -31,6 +31,9 @@ public class ClientGUI implements Runnable {
     private Socket mSocket;
     private boolean mConnected;
     private Thread mThread;
+
+    private int mCodeType = -1;
+    private boolean mEnJeu = false;
 
     DataInputStream in;
     DataOutputStream out;
@@ -53,6 +56,8 @@ public class ClientGUI implements Runnable {
     private JLabel mJLabelScore;
     private JLabel mLabelNbRoundRestants;
     private JButton mButtonQuitterPartie;
+    private JLabel mLabelNbPlayer;
+    private JLabel mLabelTimer;
     private JList mJListSalleJeu;
 
     public ClientGUI(String ip, int port, String pseudo) {
@@ -84,10 +89,17 @@ public class ClientGUI implements Runnable {
             }
         });
 
-        mButtonAccessGamePlayer.addActionListener(new ActionListener() {
+        mButtonAccessGameAudience.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 trouverSalleJeu(GUEST);
+            }
+        });
+
+        mButtonQuitterPartie.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                quitterSalleJeu();
             }
         });
 
@@ -141,6 +153,18 @@ public class ClientGUI implements Runnable {
 
         for (Joueur e : arrayPlayers) {
             mDefaultlistPlayers.addElement(e.getPseudo());
+        }
+
+    }
+
+    private void setScoreTab() throws IOException, ClassNotFoundException{
+
+        mDefaultlistScore.removeAllElements();
+
+        ArrayList<String> array = (ArrayList<String>) input.readObject();
+
+        for (String s : array) {
+            mDefaultlistScore.addElement(s);
         }
 
     }
@@ -225,8 +249,49 @@ public class ClientGUI implements Runnable {
         }
     }
 
+    public void setAudienceAndPlayers() throws IOException, ClassNotFoundException{
+
+        if(mEnJeu == true && mConnected == true) {
+
+            ArrayList<String> array = (ArrayList<String>) input.readObject();
+            mLabelNbAudience.setText(array.get(0));
+            mLabelNbPlayer.setText(array.get(1));
+
+        }
+
+    }
+
     public void trouverSalleJeu(int code){
+
+        if(mEnJeu == false && mConnected == true) {
+
+            try {
+                out.writeUTF(CONSTANTE.CLIENT_SERVER_SALLE_JEU);
+                out.write(code);
+
+                mCodeType = code;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
         return;
+    }
+
+    public void quitterSalleJeu(){
+        if(mEnJeu == true) {
+            try {
+                out.writeUTF(CONSTANTE.QUITTER_PARTIE);
+                mDefaultlistScore.removeAllElements();
+                mDefaultlistScore.addElement("Aucune salle de jeu");
+                mButtonAccessGameAudience.setEnabled(true);
+                mButtonAccessGamePlayer.setEnabled(true);
+                mJLabelScore.setText("Score : 0");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -257,7 +322,23 @@ public class ClientGUI implements Runnable {
                         case CONSTANTE.CLIENT_SERVER_CHAT:
                                 setChat();
                             break;
-
+                        case CONSTANTE.CLIENT_SERVER_NOUVEAU_AUDIENCE_NOUVEAU_JOUEUR :
+                            setAudienceAndPlayers();
+                            break;
+                        case CONSTANTE.VALIDATION_PRESENT_PARTIE :
+                            gestionCoDecoPartie();
+                            break;
+                        case CONSTANTE.TABLEAU_SCORES :
+                            setScoreTab();
+                            break;
+                        case CONSTANTE.CLIENT_PERSO_SCORE:
+                            final int score = Integer.parseInt(in.readUTF());
+                            if(score == -1) {
+                                mJLabelScore.setText("Vous êtes spectateur.");
+                            }
+                            else
+                                mJLabelScore.setText("Score : " + score);
+                            break;
                     }
                 } catch (SocketException se) {
                     se.printStackTrace();
@@ -272,13 +353,38 @@ public class ClientGUI implements Runnable {
 
     }
 
+    private void gestionCoDecoPartie() throws IOException {
+        mEnJeu = in.readBoolean();
+        mButtonAccessGameAudience.setEnabled(!mEnJeu);
+        mButtonAccessGamePlayer.setEnabled(!mEnJeu);
+        if(mEnJeu){
+            switch(mCodeType){
+                default:break;
+                case ClientGUI.MASTER :
+                    mLabelIndicatifSalleRole.setText("Vous êtes un joueur : balancez vos memes !");
+                    break;
+                case ClientGUI.GUEST :
+                    mLabelIndicatifSalleRole.setText("Vous êtes un viewer : balancez vos likes !");
+                    break;
+            }
+        }
+        else {
+            mCodeType = -1;
+            mLabelNbPlayer.setText("Nombre de joueurs : 0");
+            mLabelNbAudience.setText("Aucune audience pour le moment");
+            mLabelIndicatifSalleRole.setText("Vous n'êtes dans aucune salle !");
+            mJLabelScore.setText("Score : 0");
+            mLabelTimer.setText("Temps restant avant fin du round : 0");
+        }
+    }
+
     private void createUIComponents() {
         // TODO: place custom component creation code here
         mDefaultlistPlayers = new DefaultListModel();
         mJListJoueurs = new JList(mDefaultlistPlayers);
-        mDefaultlistSalle = new DefaultListModel();
-        mJListSalle = new JList(mDefaultlistSalle);
-        mDefaultlistSalle.addElement("Aucune salle de jeu");
+        mDefaultlistScore= new DefaultListModel();
+        mJListSalle = new JList(mDefaultlistScore);
+        mDefaultlistScore.addElement("Aucune score");
         mDefaultlistPlayers.addElement("Aucun joueurs connectés");
     }
 }

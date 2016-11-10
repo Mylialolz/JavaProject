@@ -1,21 +1,25 @@
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by Antoine on 06/11/2016.
  */
-public class SalleJeu implements Runnable {
+public class SalleJeu{
 
 
     private ArrayList<ClientManager> joueurs;
     private ArrayList<ClientManager> audience;
 
-    private Thread mGameLoop;
+    private boolean mStopGameInfo;
+    private boolean mStopGameLoop;
+
+    private GameLoop mGameLoop = new GameLoop(this);
+    private GameInfo mGameInfo = new GameInfo(this);
 
     public SalleJeu(){
         joueurs = new ArrayList<>();
         audience = new ArrayList<>();
-        mGameLoop = new Thread(this);
     }
 
     synchronized public void addPlayers(ClientManager cm){
@@ -54,12 +58,18 @@ public class SalleJeu implements Runnable {
 
     synchronized public int getNbAudience(){return audience.size();}
 
+
     public void lancerPartie(){
-        mGameLoop.start();
+        mGameLoop.demarrerPartie();
+        mGameInfo.demarrerPartie();
     }
 
-    @Override
-    public void run() {
-        // boucle de jeu ici
+    public void arreterPartie(){
+        mGameLoop.arreterPartie();
+        mGameInfo.arreterPartie();
+        clearAudience();
+        clearPlayers();
     }
+
+
 }

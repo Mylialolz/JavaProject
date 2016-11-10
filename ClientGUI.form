@@ -126,12 +126,6 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="f68d" class="javax.swing.JTextArea" binding="mTextAreaChat">
-            <constraints border-constraint="Center"/>
-            <properties>
-              <editable value="false"/>
-            </properties>
-          </component>
           <component id="a98be" class="javax.swing.JList" binding="mJListJoueurs" custom-create="true">
             <constraints border-constraint="East"/>
             <properties/>
@@ -145,6 +139,12 @@
             <properties/>
             <border type="none"/>
             <children>
+              <component id="69df9" class="javax.swing.JLabel" binding="mLabelNbPlayer">
+                <constraints/>
+                <properties>
+                  <text value="Nombre de joueurs : 0"/>
+                </properties>
+              </component>
               <component id="df54b" class="javax.swing.JLabel" binding="mJLabelScore">
                 <constraints/>
                 <properties>
@@ -158,6 +158,25 @@
                 <constraints/>
                 <properties>
                   <text value="Nombre de tours restants : 0"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <component id="f68d" class="javax.swing.JTextArea" binding="mTextAreaChat">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <grid id="d2fd0" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="North"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="e31b3" class="javax.swing.JLabel" binding="mLabelTimer">
+                <constraints/>
+                <properties>
+                  <text value="Temps avant fin du round : 0"/>
                 </properties>
               </component>
             </children>

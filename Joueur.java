@@ -6,15 +6,26 @@ import java.io.Serializable;
 public class Joueur implements Serializable {
 
     private String mPseudo;
+    private int mScore;
+
 
     public Joueur(String pseudo){
         mPseudo = pseudo;
+        mScore = -1;
     }
 
+    public Joueur(Joueur joueur) {
+        mPseudo = joueur.getPseudo();
+        mScore = joueur.getScore();
+    }
 
     public String getPseudo(){
         return mPseudo;
     }
+
+    public int getScore(){return mScore;}
+
+    public void setScore(int s){mScore = s;}
 
 }
 

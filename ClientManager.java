@@ -15,6 +15,11 @@ public class ClientManager implements Runnable {
     private Thread mThread;
     private Server mServeur;
 
+    private SalleJeu mSalleJeu = null;
+
+    private boolean mEnJeu = false;
+    private int mCodePlayer = -1;
+
     private int mId;
 
     private Joueur mJoueur;
@@ -56,7 +61,6 @@ public class ClientManager implements Runnable {
 
     }
 
-
     public void envoyerListeJoueursConnectes(){
 
         try {
@@ -72,6 +76,44 @@ public class ClientManager implements Runnable {
 
     }
 
+    public void envoyerTableauScores(){
+
+        if(mEnJeu == true && mSalleJeu != null) {
+
+            ArrayList<ClientManager> list = null;
+            ArrayList<String> finalList = new ArrayList<>();
+
+            try {
+                out.writeUTF(CONSTANTE.TABLEAU_SCORES);
+
+                list = mSalleJeu.getPlayers();
+                for(ClientManager cm : list){
+                    String s = "" + cm.getJoueur().getPseudo() + " " + cm.getJoueur().getScore();
+                    finalList.add(s);
+                }
+                oos.writeObject(finalList);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    public void envoyerScorePerso(){
+
+        if(mEnJeu == true && mSalleJeu != null) {
+            try {
+
+                out.writeUTF(CONSTANTE.CLIENT_PERSO_SCORE);
+                out.writeUTF("" + mJoueur.getScore());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void distribuerMessageChat(String s, int id){
 
@@ -87,7 +129,6 @@ public class ClientManager implements Runnable {
         }
 
     }
-
 
     private void handleRequests() {
 
@@ -118,7 +159,11 @@ public class ClientManager implements Runnable {
                     break;
 
                 case CONSTANTE.CLIENT_SERVER_SALLE_JEU :
-                    // ajouter code ici
+                    connecterPartie();
+                    break;
+
+                case CONSTANTE.QUITTER_PARTIE :
+                    deconnecterClientPartie();
                     break;
             }
 
@@ -131,9 +176,73 @@ public class ClientManager implements Runnable {
         }
     }
 
+    private void connecterPartie() throws IOException {
+
+        if(mEnJeu == false ) {
+
+            mSalleJeu = mServeur.getJeu();
+
+            if (mSalleJeu != null) {
+                int code = in.read();
+                switch (code) {
+                    case ClientGUI.GUEST:
+                        mJoueur.setScore(-1);
+                        mSalleJeu.addAudience(this);
+                        mCodePlayer = ClientGUI.GUEST;
+                        break;
+                    case ClientGUI.MASTER:
+                        mJoueur.setScore(0);
+                        mSalleJeu.addPlayers(this);
+                        mCodePlayer = ClientGUI.MASTER;
+                        break;
+                    default:
+                        mSalleJeu = null;
+                        break;
+                }
+            }
+
+            if (mSalleJeu != null) {
+
+                out.writeUTF(CONSTANTE.VALIDATION_PRESENT_PARTIE);
+                out.writeBoolean(true);
+
+                mEnJeu = true;
+                mServeur.newMemberInGame();
+            }
+        }
+
+    }
+
+    public void updateCountersOfAudienceAndPlayersInGame(){
+
+        if(mEnJeu == true) {
+
+            try {
+                out.writeUTF(CONSTANTE.CLIENT_SERVER_NOUVEAU_AUDIENCE_NOUVEAU_JOUEUR);
+                ArrayList<String> list = new ArrayList<>();
+
+                final int nbAudience = mSalleJeu.getNbAudience();
+                final int nbPlayers = mSalleJeu.getNbPlayers();
+
+                list.add("" + nbAudience + " viewers connecté(s).");
+                list.add("" + nbPlayers + " joueurs connecté(s).");
+
+                oos.writeObject(list);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
 
     private void handleClose() {
         try {
+
+
+            deconnecterClientPartie();
+
+
             out.close();
             in.close();
             oos.close();
@@ -149,11 +258,35 @@ public class ClientManager implements Runnable {
 
             mServeur.newPlayer();
 
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void deconnecterClientPartie() {
+
+        try {
+            out.writeUTF(CONSTANTE.VALIDATION_PRESENT_PARTIE);
+            out.writeBoolean(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if(mCodePlayer != -1 && mCodePlayer == ClientGUI.GUEST)
+            mSalleJeu.removeAudience(this);
+        if(mCodePlayer != -1 && mCodePlayer == ClientGUI.MASTER)
+            mSalleJeu.removePlayers(this);
+
+        mEnJeu = false;
+        mCodePlayer = -1;
+        mSalleJeu = null;
+        mServeur.newMemberInGame();
+    }
+
+    public Joueur getJoueur(){
+        return mJoueur;
+    }
 
     /*if(!data.matches("stop")) {
                 if (data.matches("image")) {
