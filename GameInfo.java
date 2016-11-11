@@ -29,14 +29,24 @@ public class GameInfo implements Runnable {
         while (!stop) {
             try {
 
+                final int phase = mSalle.getGamePhase();
+                final int timer = mSalle.getTimeInPhase();
+                final int nbRound = mSalle.getNumRound();
+
                 for(ClientManager cm : mSalle.getAudience()){
                     cm.envoyerTableauScores();
                     cm.envoyerScorePerso();
+                    cm.envoyerNumeroPhase(phase);
+                    cm.envoyerTimerPhase(timer);
+                    cm.envoyerNbRound(nbRound);
                 }
 
                 for(ClientManager cm : mSalle.getPlayers()){
                     cm.envoyerTableauScores();
                     cm.envoyerScorePerso();
+                    cm.envoyerNumeroPhase(phase);
+                    cm.envoyerTimerPhase(timer);
+                    cm.envoyerNbRound(nbRound);
                 }
 
                 Thread.sleep(1000);

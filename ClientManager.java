@@ -1,6 +1,7 @@
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.invoke.SerializedLambda;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -128,6 +129,54 @@ public class ClientManager implements Runnable {
 
         }
 
+    }
+
+    public void envoyerNumeroPhase(int phase){
+        if(mEnJeu == true && mSalleJeu != null) {
+            try {
+
+                out.writeUTF(CONSTANTE.PHASE_JEU);
+                out.writeUTF("" +  phase);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void envoyerTimerPhase(int v){
+        if(mEnJeu == true && mSalleJeu != null) {
+            try {
+
+                out.writeUTF(CONSTANTE.TIMER_PHASE_JEU);
+                out.writeUTF("" +  v);
+
+                if(mSalleJeu.getGamePhase() == 1){
+                    out.writeUTF("" + SalleJeu.TIME_BOUND_P1);
+                }
+
+                if(mSalleJeu.getGamePhase() == 2){
+                    out.writeUTF("" + SalleJeu.TIME_BOUND_P2);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void envoyerNbRound(int v){
+        if(mEnJeu == true && mSalleJeu != null) {
+            try {
+
+                out.writeUTF(CONSTANTE.NB_ROUND_RESTANTS);
+                out.writeUTF("" +  v);
+                out.writeUTF("" + SalleJeu.MAX_ROUNDS);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void handleRequests() {

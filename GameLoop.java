@@ -1,5 +1,3 @@
-import com.sun.deploy.util.SessionState;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
@@ -20,25 +18,31 @@ public class GameLoop {
     private ActionListener taskPhase = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (indicePhase == 1) {
 
-                if (compteurPhase < 90) indicePhase = 1;
-                else indicePhase = 2;
-
+            if (getIndicePhase() == 1) { // preparation des memes
+                if (getCompteurPhase() < SalleJeu.TIME_BOUND_P1) {
+                    setCompteurPhase(getCompteurPhase() + 1);
+                    setIndicePhase(1);
+                }
+                else {
+                    setCompteurPhase(0);
+                    setIndicePhase(2);
+                }
             }
 
-            if (indicePhase == 2) {
-                if (compteurPhase < 45) indicePhase = 2;
-                else indicePhase = 1;
+            if (getIndicePhase() == 2) { // votes pour les memes
+                if (getCompteurPhase() < SalleJeu.TIME_BOUND_P2) {
+                    setCompteurPhase(getCompteurPhase() + 1);
+                    setIndicePhase(2);
+                }
+                else {
+                    setCompteurPhase(0);
+                    setIndicePhase(1);
+                }
             }
 
-            compteurPhase++;
-
-
-            if(mRound > 5){
-                t.stop();
-            }
-
+            if(mRound >= SalleJeu.MAX_ROUNDS)
+                arreterPartie();
 
         }
     };
@@ -51,7 +55,7 @@ public class GameLoop {
     public void demarrerPartie(){
         t = new Timer(1000, taskPhase);
         mRound = 1;
-        indicePhase = 1;
+        setIndicePhase(1);
         t.start();
     }
 
@@ -59,6 +63,26 @@ public class GameLoop {
         if(t.isRunning()){
             t.stop();
         }
+    }
+
+    synchronized public int getIndicePhase() {
+        return indicePhase;
+    }
+
+    synchronized public void setIndicePhase(int indicePhase) {
+        this.indicePhase = indicePhase;
+    }
+
+    synchronized public int getCompteurPhase() {
+        return compteurPhase;
+    }
+
+    synchronized public void setCompteurPhase(int compteurPhase) {
+        this.compteurPhase = compteurPhase;
+    }
+
+    synchronized public int getNumRound(){
+        return mRound;
     }
 
 }

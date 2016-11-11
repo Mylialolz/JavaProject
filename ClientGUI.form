@@ -145,6 +145,9 @@
                   <text value="Nombre de joueurs : 0"/>
                 </properties>
               </component>
+              <hspacer id="feb27">
+                <constraints/>
+              </hspacer>
               <component id="df54b" class="javax.swing.JLabel" binding="mJLabelScore">
                 <constraints/>
                 <properties>
@@ -162,12 +165,6 @@
               </component>
             </children>
           </grid>
-          <component id="f68d" class="javax.swing.JTextArea" binding="mTextAreaChat">
-            <constraints border-constraint="Center"/>
-            <properties>
-              <editable value="false"/>
-            </properties>
-          </component>
           <grid id="d2fd0" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
             <constraints border-constraint="North"/>
             <properties/>
@@ -177,6 +174,28 @@
                 <constraints/>
                 <properties>
                   <text value="Temps avant fin du round : 0"/>
+                </properties>
+              </component>
+              <hspacer id="ee0fe">
+                <constraints/>
+              </hspacer>
+              <component id="e7fa2" class="javax.swing.JLabel" binding="mLabelThemeRound">
+                <constraints/>
+                <properties>
+                  <text value="Thème du round : inconnu"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="f01d0" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="f68d" class="javax.swing.JTextArea" binding="mTextAreaChat">
+                <constraints border-constraint="Center"/>
+                <properties>
+                  <editable value="false"/>
                 </properties>
               </component>
             </children>

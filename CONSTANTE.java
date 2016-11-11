@@ -29,5 +29,11 @@ public class CONSTANTE {
 
     public final static String TIMER_VALUE_ROUND = "t_v_r";
 
+    public final static String PHASE_JEU = "p_j_";
+
+    public final static String TIMER_PHASE_JEU = "t_p_j";
+
+    public final static String NB_ROUND_RESTANTS = "n_r_r";
+
 
 }

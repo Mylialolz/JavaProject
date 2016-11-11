@@ -58,6 +58,7 @@ public class ClientGUI implements Runnable {
     private JButton mButtonQuitterPartie;
     private JLabel mLabelNbPlayer;
     private JLabel mLabelTimer;
+    private JLabel mLabelThemeRound;
     private JList mJListSalleJeu;
 
     public ClientGUI(String ip, int port, String pseudo) {
@@ -288,6 +289,8 @@ public class ClientGUI implements Runnable {
                 mButtonAccessGameAudience.setEnabled(true);
                 mButtonAccessGamePlayer.setEnabled(true);
                 mJLabelScore.setText("Score : 0");
+                mLabelIndicatifSalleRole.setText("Vous n'êtes dans aucune salle de jeu !");
+                mLabelTimer.setText("Temps avant la fin du round : 0");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -339,6 +342,24 @@ public class ClientGUI implements Runnable {
                             else
                                 mJLabelScore.setText("Score : " + score);
                             break;
+                        case CONSTANTE.TIMER_PHASE_JEU :
+                            final int time = Integer.parseInt(in.readUTF());
+                            final int bound = Integer.parseInt(in.readUTF());
+                            mLabelTimer.setText("Temps avant la fin du round : " + time + "/" + bound);
+                            break;
+                        case CONSTANTE.PHASE_JEU :
+                            final int phase = Integer.parseInt(in.readUTF());
+                            if(phase == 1) {
+                                mLabelIndicatifSalleRole.setText("Phase 1 : les joueurs conçoivent leur meme !");
+                            }
+                            if (phase == 2){
+                                mLabelIndicatifSalleRole.setText("Phase 2 : l'audience vote !");
+                            }
+                            break;
+                        case CONSTANTE.NB_ROUND_RESTANTS:
+                            final int r = Integer.parseInt(in.readUTF());
+                            final int b = Integer.parseInt(in.readUTF());
+                            mLabelNbRoundRestants.setText("Nombre de tours restant : " + r + "/" + b);
                     }
                 } catch (SocketException se) {
                     se.printStackTrace();
@@ -386,5 +407,6 @@ public class ClientGUI implements Runnable {
         mJListSalle = new JList(mDefaultlistScore);
         mDefaultlistScore.addElement("Aucune score");
         mDefaultlistPlayers.addElement("Aucun joueurs connectés");
+
     }
 }

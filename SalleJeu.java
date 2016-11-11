@@ -8,11 +8,13 @@ import java.util.concurrent.Semaphore;
 public class SalleJeu{
 
 
+    public static final int TIME_BOUND_P1 = 15;
+    public static final int TIME_BOUND_P2 = 15;
+    public static final int MAX_ROUNDS = 5;
+
+
     private ArrayList<ClientManager> joueurs;
     private ArrayList<ClientManager> audience;
-
-    private boolean mStopGameInfo;
-    private boolean mStopGameLoop;
 
     private GameLoop mGameLoop = new GameLoop(this);
     private GameInfo mGameInfo = new GameInfo(this);
@@ -57,6 +59,12 @@ public class SalleJeu{
     synchronized public int getNbPlayers(){return joueurs.size();}
 
     synchronized public int getNbAudience(){return audience.size();}
+
+    synchronized public int getGamePhase(){return mGameLoop.getIndicePhase();}
+
+    synchronized public int getTimeInPhase(){return mGameLoop.getCompteurPhase();}
+
+    synchronized public int getNumRound(){return mGameLoop.getNumRound();}
 
 
     public void lancerPartie(){
