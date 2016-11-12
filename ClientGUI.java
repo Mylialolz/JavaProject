@@ -69,6 +69,9 @@ public class ClientGUI implements Runnable {
     private JPanel Chat;
     private JPanel mPaneMeme;
     private JButton mButtonEnvoyerMeme;
+    private JTextField mTextFieldCheminMeme;
+    private JCheckBox mCheckBoxFile;
+    private JCheckBox mCheckBoxURL;
     private JList mJListSalleJeu;
     private GridLayout mGridMemeLayout;
 
@@ -119,6 +122,22 @@ public class ClientGUI implements Runnable {
             }
         });
 
+        mButtonEnvoyerMeme.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if(mCheckBoxFile.isSelected() && !mCheckBoxURL.isSelected()){
+                    String chemin = mTextFieldCheminMeme.getText();
+                    sendMemeByFile(chemin);
+                }
+
+                if(!mCheckBoxFile.isSelected() && mCheckBoxURL.isSelected()){
+                    String url = mTextFieldCheminMeme.getText();
+                    sendMemeByURL(url);
+                }
+
+            }
+        });
 
     }
 
@@ -206,17 +225,29 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public int sendMeme(String chemin) {
+    public int sendMemeByFile(String chemin) {
 
         try {
-            out.writeUTF(CONSTANTE.ENVOYER_MEME);
-            BufferedImage image = ImageIO.read(new File(chemin));
-            ImageIO.write(image, "png", out);
+            String extension = "";
+            final int i = chemin.lastIndexOf('.');
+            if (i > 0) {
+                extension = chemin.substring(i+1);
+            }
+
+            if(extension.matches("png") || extension.matches("jpg")) {
+                out.writeUTF(CONSTANTE.ENVOYER_MEME);
+                BufferedImage image = ImageIO.read(new File(chemin));
+                ImageIO.write(image, extension, out);
+            }
             return 0;
         } catch (IOException e) {
             e.printStackTrace();
             return 1;
         }
+    }
+
+    public int sendMemeByURL(String URL){
+        return 0;
     }
 
     public void envoyerMessageChat(String message){

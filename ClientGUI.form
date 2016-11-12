@@ -115,6 +115,24 @@
                   <hspacer id="7ed73">
                     <constraints/>
                   </hspacer>
+                  <component id="dae0e" class="javax.swing.JCheckBox" binding="mCheckBoxURL">
+                    <constraints/>
+                    <properties>
+                      <text value="Par URL"/>
+                    </properties>
+                  </component>
+                  <component id="3b5af" class="javax.swing.JCheckBox" binding="mCheckBoxFile">
+                    <constraints/>
+                    <properties>
+                      <text value="Par fichier"/>
+                    </properties>
+                  </component>
+                  <component id="7f6d2" class="javax.swing.JTextField" binding="mTextFieldCheminMeme">
+                    <constraints/>
+                    <properties>
+                      <preferredSize width="75" height="24"/>
+                    </properties>
+                  </component>
                   <component id="b996c" class="javax.swing.JButton" binding="mButtonEnvoyerMeme">
                     <constraints/>
                     <properties>

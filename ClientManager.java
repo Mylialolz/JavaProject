@@ -218,6 +218,9 @@ public class ClientManager implements Runnable {
                     ClientManager cm = mSalleJeu.getPlayers().get(Integer.parseInt(in.readUTF()));
                     cm.getJoueur().setScore(cm.getJoueur().getScore() + 1);
                     break;
+                case CONSTANTE.ENVOYER_MEME :
+                    // a completer
+                    break;
             }
 
         } catch (java.net.SocketException se) {
