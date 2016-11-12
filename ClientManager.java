@@ -214,6 +214,10 @@ public class ClientManager implements Runnable {
                 case CONSTANTE.QUITTER_PARTIE :
                     deconnecterClientPartie();
                     break;
+                case CONSTANTE.ENVOYER_UPVOTE :
+                    ClientManager cm = mSalleJeu.getPlayers().get(Integer.parseInt(in.readUTF()));
+                    cm.getJoueur().setScore(cm.getJoueur().getScore() + 1);
+                    break;
             }
 
         } catch (java.net.SocketException se) {

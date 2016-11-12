@@ -35,5 +35,9 @@ public class CONSTANTE {
 
     public final static String NB_ROUND_RESTANTS = "n_r_r";
 
+    public final static String ENVOYER_UPVOTE = "e_upvote";
+
+    public final static String ENVOYER_MEME = "e_meme";
+
 
 }

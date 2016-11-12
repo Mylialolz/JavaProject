@@ -3,6 +3,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
@@ -23,6 +27,8 @@ public class ClientGUI implements Runnable {
     //private ArrayList<Joueur> mArrayPlayers;
     private DefaultListModel mDefaultlistPlayers;
     private DefaultListModel mDefaultlistScore;
+
+    private ArrayList<JLabel> mMemeToDisplay;
 
     private final String mIp;
     private final int mPort;
@@ -59,7 +65,12 @@ public class ClientGUI implements Runnable {
     private JLabel mLabelNbPlayer;
     private JLabel mLabelTimer;
     private JLabel mLabelThemeRound;
+    private JTabbedPane mTabPane;
+    private JPanel Chat;
+    private JPanel mPaneMeme;
+    private JButton mButtonEnvoyerMeme;
     private JList mJListSalleJeu;
+    private GridLayout mGridMemeLayout;
 
     public ClientGUI(String ip, int port, String pseudo) {
         mIp = ip;
@@ -67,6 +78,10 @@ public class ClientGUI implements Runnable {
         mConnected = false;
         mPseudo = pseudo;
         mThread = new Thread(this);
+
+
+        mTabPane.setTitleAt(0, "Chat");
+        mTabPane.setTitleAt(1, "Les memes");
 
         mButtonEnvoyerMessage.addActionListener(new ActionListener() {
             @Override
@@ -191,12 +206,12 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public int sendMeme(Socket socket, String chemin) {
+    public int sendMeme(String chemin) {
 
         try {
-            OutputStream outputStream = socket.getOutputStream();
+            out.writeUTF(CONSTANTE.ENVOYER_MEME);
             BufferedImage image = ImageIO.read(new File(chemin));
-            ImageIO.write(image, "png", outputStream);
+            ImageIO.write(image, "png", out);
             return 0;
         } catch (IOException e) {
             e.printStackTrace();
@@ -408,5 +423,61 @@ public class ClientGUI implements Runnable {
         mDefaultlistScore.addElement("Aucune score");
         mDefaultlistPlayers.addElement("Aucun joueurs connectés");
 
+
+        mTabPane = new JTabbedPane();
+        mGridMemeLayout = new GridLayout(2,3);
+        mPaneMeme = new JPanel(mGridMemeLayout);
+        mMemeToDisplay = new ArrayList<>();
+
+        for(int i = 0; i < 6; i++) {
+
+            ImageIcon iconLogo = new ImageIcon("C:\\Users\\Antoine\\Desktop\\oiseau.jpg");
+
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            double width = screenSize.getWidth();
+            double height = screenSize.getHeight();
+            Image scaledImage = iconLogo.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
+
+            JLabel label = new JLabel();
+            label.setIcon(new ImageIcon(scaledImage));
+            mMemeToDisplay.add(label);
+
+            int finalI = i;
+
+            label.addMouseListener(new MouseAdapter() {
+                private int index = finalI;
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if(e.getClickCount() == 2 || SwingUtilities.isRightMouseButton(e)){
+                        envoyerVote(index);
+                    }
+                }
+            });
+
+            mPaneMeme.add(label);
+
+        }
     }
+
+
+
+    public void envoyerVote(int i) {
+
+        if (mConnected && mEnJeu) {
+            final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Veuillez confirmer votre vote pour ce meme",
+                     "Confirmation du vote", JOptionPane.YES_NO_OPTION);
+
+            if(r == JOptionPane.YES_OPTION){
+                try {
+
+                    out.writeUTF(CONSTANTE.ENVOYER_UPVOTE);
+                    out.writeUTF("" + i);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 }
