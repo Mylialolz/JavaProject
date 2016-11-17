@@ -5,8 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
@@ -40,6 +38,7 @@ public class ClientGUI implements Runnable {
 
     private int mCodeType = -1;
     private boolean mEnJeu = false;
+    private boolean mCanVote = false;
 
     DataInputStream in;
     DataOutputStream out;
@@ -72,6 +71,7 @@ public class ClientGUI implements Runnable {
     private JTextField mTextFieldCheminMeme;
     private JCheckBox mCheckBoxFile;
     private JCheckBox mCheckBoxURL;
+    private JLabel mMessageAvantPartie;
     private JList mJListSalleJeu;
     private GridLayout mGridMemeLayout;
 
@@ -406,6 +406,14 @@ public class ClientGUI implements Runnable {
                             final int r = Integer.parseInt(in.readUTF());
                             final int b = Integer.parseInt(in.readUTF());
                             mLabelNbRoundRestants.setText("Nombre de tours restant : " + r + "/" + b);
+                            break;
+                        case CONSTANTE.TEMPS_AVANT_PROCHAINE_PARTIE :
+                            String m = in.readUTF();
+                            mMessageAvantPartie.setText(m);
+                            break;
+                        case CONSTANTE.VALIDATION_UPVOTE:
+                            mCanVote = in.readBoolean();
+                            break;
                     }
                 } catch (SocketException se) {
                     se.printStackTrace();
@@ -490,23 +498,31 @@ public class ClientGUI implements Runnable {
         }
     }
 
-
-
     public void envoyerVote(int i) {
 
         if (mConnected && mEnJeu) {
-            final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Veuillez confirmer votre vote pour ce meme",
-                     "Confirmation du vote", JOptionPane.YES_NO_OPTION);
 
-            if(r == JOptionPane.YES_OPTION){
-                try {
+            if(mCanVote) {
 
-                    out.writeUTF(CONSTANTE.ENVOYER_UPVOTE);
-                    out.writeUTF("" + i);
+                final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Veuillez confirmer votre vote pour ce meme",
+                        "Confirmation du vote", JOptionPane.YES_NO_OPTION);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (r == JOptionPane.YES_OPTION) {
+                    try {
+
+                        out.writeUTF(CONSTANTE.ENVOYER_UPVOTE);
+                        out.writeUTF("" + i);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+            }
+            else {
+
+                final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Vous avez déjà voté !",
+                        "Erreur", JOptionPane.YES_NO_OPTION);
+
             }
         }
     }

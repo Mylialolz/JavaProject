@@ -28,6 +28,8 @@ public class ClientManager implements Runnable {
     private DataOutputStream out;
     ObjectOutputStream oos;
 
+    private boolean mCanVote = false;
+
     public ClientManager(Server s, Socket e, int id){
 
         mServeur = s;
@@ -179,6 +181,29 @@ public class ClientManager implements Runnable {
         }
     }
 
+    public void envoyerTempsAvantDebutPartie(int v){
+        if(mEnJeu == true && mSalleJeu != null) {
+            try {
+
+                out.writeUTF(CONSTANTE.TEMPS_AVANT_PROCHAINE_PARTIE);
+
+                final int compteur = mSalleJeu.getTimerAvantNouvellePartie();
+                final int nbPlayers = mSalleJeu.getNbPlayers();
+
+                if(nbPlayers > 1) {
+                    out.writeUTF("Temps avant début de la partie : " + compteur + "/" + SalleJeu.WAITINTG_TIME + ". Nombre de joueurs : " + nbPlayers + "/" + SalleJeu.NB_MAX_JOUEURS);
+                }
+                else {
+                    out.writeUTF("Erreur : Pas assez de joueurs pour commencer la partie !");
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void handleRequests() {
 
         try {
@@ -217,9 +242,11 @@ public class ClientManager implements Runnable {
                 case CONSTANTE.ENVOYER_UPVOTE :
                     ClientManager cm = mSalleJeu.getPlayers().get(Integer.parseInt(in.readUTF()));
                     cm.getJoueur().setScore(cm.getJoueur().getScore() + 1);
+                    nouveauVote(false);
                     break;
                 case CONSTANTE.ENVOYER_MEME :
                     // a completer
+
                     break;
             }
 
@@ -230,6 +257,14 @@ public class ClientManager implements Runnable {
             e.printStackTrace();
             stopThread = 1;
         }
+    }
+
+    public void recevoirMeme() throws IOException{
+
+        BufferedImage bufferedImage = ImageIO.read(mSocket.getInputStream());
+        File outputfile = new File("C:/Users/Antoine/Desktop/reception.png");
+        ImageIO.write(bufferedImage, "png", outputfile);
+
     }
 
     private void connecterPartie() throws IOException {
@@ -263,6 +298,7 @@ public class ClientManager implements Runnable {
                 out.writeBoolean(true);
 
                 mEnJeu = true;
+                mCanVote = true;
                 mServeur.newMemberInGame();
             }
         }
@@ -335,6 +371,7 @@ public class ClientManager implements Runnable {
             mSalleJeu.removePlayers(this);
 
         mEnJeu = false;
+        mCanVote = false;
         mCodePlayer = -1;
         mSalleJeu = null;
         mServeur.newMemberInGame();
@@ -344,14 +381,10 @@ public class ClientManager implements Runnable {
         return mJoueur;
     }
 
-    /*if(!data.matches("stop")) {
-                if (data.matches("image")) {
-                    BufferedImage bufferedImage = ImageIO.read(mSocket.getInputStream());
-                    File outputfile = new File("C:/Users/Antoine/Desktop/reception.png");
-                    ImageIO.write(bufferedImage, "png", outputfile);
-                }
-                System.out.println("Donnees : " + data);
-                out.writeUTF("ok");
-            }*/
+    public void nouveauVote (boolean etat) throws IOException{
+        mCanVote = etat;
+        out.writeUTF(CONSTANTE.VALIDATION_UPVOTE);
+        out.writeBoolean(mCanVote);
+    }
 
 }

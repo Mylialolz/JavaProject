@@ -102,7 +102,6 @@ public class Server {
         for(ClientManager cm : mManagers){
             cm.updateCountersOfAudienceAndPlayersInGame();
         }
-        mSalleJeu.lancerPartie();
     }
 
 

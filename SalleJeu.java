@@ -1,5 +1,8 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import javax.swing.Timer;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -12,6 +15,9 @@ public class SalleJeu{
     public static final int TIME_BOUND_P2 = 15;
     public static final int MAX_ROUNDS = 5;
 
+    public static final int NB_MAX_JOUEURS = 6;
+    public static final int WAITINTG_TIME = 90;
+
 
     private ArrayList<ClientManager> joueurs;
     private ArrayList<ClientManager> audience;
@@ -19,13 +25,61 @@ public class SalleJeu{
     private GameLoop mGameLoop = new GameLoop(this);
     private GameInfo mGameInfo = new GameInfo(this);
 
+    private Timer tempsAvantPartie;
+    private int compteur = 0;
+
+    private ActionListener task = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(getNbPlayers()> 1){
+
+                ++compteur;
+                for(ClientManager cm : getPlayers()){
+                    cm.envoyerTempsAvantDebutPartie(compteur);
+                }
+
+                for(ClientManager cm : getAudience()){
+                    cm.envoyerTempsAvantDebutPartie(compteur);
+                }
+
+                final int nbPlayers = getNbPlayers();
+
+                if(nbPlayers == NB_MAX_JOUEURS){
+                    lancerPartie();
+                }
+
+                if(compteur >= WAITINTG_TIME){
+                    lancerPartie();
+                }
+            }
+            else {
+                compteur = 0;
+
+                for(ClientManager cm : getPlayers()){
+                    cm.envoyerTempsAvantDebutPartie(compteur);
+                }
+
+                for(ClientManager cm : getAudience()){
+                    cm.envoyerTempsAvantDebutPartie(compteur);
+                }
+            }
+
+        }
+    };
+
     public SalleJeu(){
         joueurs = new ArrayList<>();
         audience = new ArrayList<>();
+        tempsAvantPartie = new Timer(850, task);
+        tempsAvantPartie.start();
     }
 
-    synchronized public void addPlayers(ClientManager cm){
-        joueurs.add(cm);
+    synchronized public int addPlayers(ClientManager cm){
+        if(getNbPlayers() < 6) {
+            joueurs.add(cm);
+            return 0;
+        }
+        return 1;
     }
 
     synchronized public void addAudience(ClientManager cm){
@@ -66,8 +120,10 @@ public class SalleJeu{
 
     synchronized public int getNumRound(){return mGameLoop.getNumRound();}
 
+    synchronized public int getTimerAvantNouvellePartie(){return compteur;}
 
     public void lancerPartie(){
+        tempsAvantPartie.stop();
         mGameLoop.demarrerPartie();
         mGameInfo.demarrerPartie();
     }
@@ -77,6 +133,7 @@ public class SalleJeu{
         mGameInfo.arreterPartie();
         clearAudience();
         clearPlayers();
+        tempsAvantPartie.start();
     }
 
 

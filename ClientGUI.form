@@ -38,6 +38,12 @@
                   <text value="Veuillez vous connecter pour jouer"/>
                 </properties>
               </component>
+              <component id="e1307" class="javax.swing.JLabel" binding="mMessageAvantPartie">
+                <constraints/>
+                <properties>
+                  <text value="Indications sur la partie en cours"/>
+                </properties>
+              </component>
             </children>
           </grid>
         </children>

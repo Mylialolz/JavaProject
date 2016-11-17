@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import javax.swing.Timer;
 
 /**
@@ -20,6 +21,9 @@ public class GameLoop {
         public void actionPerformed(ActionEvent e) {
 
             if (getIndicePhase() == 1) { // preparation des memes
+
+                nouvellePhaseVote(false);
+
                 if (getCompteurPhase() < SalleJeu.TIME_BOUND_P1) {
                     setCompteurPhase(getCompteurPhase() + 1);
                     setIndicePhase(1);
@@ -31,6 +35,9 @@ public class GameLoop {
             }
 
             if (getIndicePhase() == 2) { // votes pour les memes
+
+                nouvellePhaseVote(false);
+
                 if (getCompteurPhase() < SalleJeu.TIME_BOUND_P2) {
                     setCompteurPhase(getCompteurPhase() + 1);
                     setIndicePhase(2);
@@ -62,6 +69,18 @@ public class GameLoop {
     public void arreterPartie(){
         if(t.isRunning()){
             t.stop();
+        }
+    }
+
+    private void nouvellePhaseVote(boolean etat){
+        try {
+            for(ClientManager cm : mSalle.getPlayers())
+                cm.nouveauVote(etat);
+            for(ClientManager cm : mSalle.getAudience())
+                cm.nouveauVote(etat);
+
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
     }
 

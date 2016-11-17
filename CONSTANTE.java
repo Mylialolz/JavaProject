@@ -39,5 +39,9 @@ public class CONSTANTE {
 
     public final static String ENVOYER_MEME = "e_meme";
 
+    public final static String TEMPS_AVANT_PROCHAINE_PARTIE = "t_a_p_p";
+
+    public final static String VALIDATION_UPVOTE = "v_upvote";
+
 
 }
