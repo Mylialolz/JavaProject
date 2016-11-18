@@ -1,3 +1,5 @@
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -29,6 +31,7 @@ public class ClientManager implements Runnable {
     ObjectOutputStream oos;
 
     private boolean mCanVote = false;
+    private BufferedImage mBufferedImage = null;
 
     public ClientManager(Server s, Socket e, int id){
 
@@ -246,7 +249,8 @@ public class ClientManager implements Runnable {
                     break;
                 case CONSTANTE.ENVOYER_MEME :
                     // a completer
-
+                    recevoirMeme();
+                    diffuserMeme();
                     break;
             }
 
@@ -261,9 +265,39 @@ public class ClientManager implements Runnable {
 
     public void recevoirMeme() throws IOException{
 
-        BufferedImage bufferedImage = ImageIO.read(mSocket.getInputStream());
-        File outputfile = new File("C:/Users/Antoine/Desktop/reception.png");
-        ImageIO.write(bufferedImage, "png", outputfile);
+        mBufferedImage = ImageIO.read(mSocket.getInputStream());
+        String save = "./joueur_" + mId + ".png";
+        File outputfile = new File(save);
+        ImageIO.write(mBufferedImage, "png", outputfile);
+
+    }
+
+    public void getMeme(BufferedImage meme, int joueur) throws IOException{
+
+        out.writeUTF(CONSTANTE.DIFFUSION_MEME);
+        out.writeInt(joueur);
+        ImageIO.write(meme, "png", out);
+
+    }
+
+    synchronized public void diffuserMeme() throws IOException{
+
+        ArrayList<ClientManager> audience = mSalleJeu.getAudience();
+        ArrayList<ClientManager> joueur = mSalleJeu.getPlayers();
+
+        final int index = joueur.indexOf(this);
+
+        for(ClientManager cm : audience){
+            if(mBufferedImage != null) {
+                cm.getMeme(mBufferedImage, index);
+            }
+        }
+
+        for(ClientManager cm : joueur){
+            if(mBufferedImage != null) {
+                cm.getMeme(mBufferedImage, index);
+            }
+        }
 
     }
 

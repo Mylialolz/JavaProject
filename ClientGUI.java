@@ -74,6 +74,9 @@ public class ClientGUI implements Runnable {
     private JLabel mMessageAvantPartie;
     private JList mJListSalleJeu;
     private GridLayout mGridMemeLayout;
+    private double width;
+    private double height;
+
 
     public ClientGUI(String ip, int port, String pseudo) {
         mIp = ip;
@@ -81,6 +84,8 @@ public class ClientGUI implements Runnable {
         mConnected = false;
         mPseudo = pseudo;
         mThread = new Thread(this);
+
+
 
 
         mTabPane.setTitleAt(0, "Chat");
@@ -414,6 +419,14 @@ public class ClientGUI implements Runnable {
                         case CONSTANTE.VALIDATION_UPVOTE:
                             mCanVote = in.readBoolean();
                             break;
+                        case CONSTANTE.DIFFUSION_MEME :
+                            final int index = in.readInt();
+                            BufferedImage bImage = ImageIO.read(mSocket.getInputStream());
+                            ImageIcon imageIcon = new ImageIcon(bImage);
+                            Image scaledImage = imageIcon.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
+                            ImageIcon iconLogo = new ImageIcon(scaledImage);
+                            mMemeToDisplay.get(index).setIcon(iconLogo);
+                            break;
                     }
                 } catch (SocketException se) {
                     se.printStackTrace();
@@ -468,13 +481,14 @@ public class ClientGUI implements Runnable {
         mPaneMeme = new JPanel(mGridMemeLayout);
         mMemeToDisplay = new ArrayList<>();
 
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        width = screenSize.getWidth();
+        height = screenSize.getHeight();
+
         for(int i = 0; i < 6; i++) {
 
             ImageIcon iconLogo = new ImageIcon("C:\\Users\\Antoine\\Desktop\\oiseau.jpg");
 
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            double width = screenSize.getWidth();
-            double height = screenSize.getHeight();
             Image scaledImage = iconLogo.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
 
             JLabel label = new JLabel();

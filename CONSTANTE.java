@@ -11,6 +11,7 @@ public class CONSTANTE {
     public final static String CLOSE_CONNECTION = "CLOSE_CONNECTION";
 
     public final static String CLIENT_SERVER_PSEUDO = "PSEUDO";
+
     public final static String CLIENT_SERVER_STOP = "STOP";
 
     public final static String CLIENT_SERVER_CHAT = "CHAT";
@@ -42,6 +43,8 @@ public class CONSTANTE {
     public final static String TEMPS_AVANT_PROCHAINE_PARTIE = "t_a_p_p";
 
     public final static String VALIDATION_UPVOTE = "v_upvote";
+
+    public final static String DIFFUSION_MEME = "d_meme";
 
 
 }
