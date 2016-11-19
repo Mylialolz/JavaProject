@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -131,9 +132,6 @@ public class ClientGUI implements Runnable {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    System.out.println("bouton meme");
-                    out.writeUTF(CONSTANTE.ENVOYER_MEME);
-
                     if(mCheckBoxFile.isSelected() && !mCheckBoxURL.isSelected()){
                         String chemin = mTextFieldCheminMeme.getText();
                         sendMemeByFile(chemin);
@@ -249,12 +247,23 @@ public class ClientGUI implements Runnable {
             }
             System.out.println("Extension : " + extension);
             if (extension.matches("png") || extension.matches("jpg")) {
-                BufferedImage image = ImageIO.read(new File(chemin));
-                if (image != null) {
-                    System.out.println(image);
-                    ImageIO.write(image, extension, out);
-                    System.out.println("Envoi confirmé");
+
+                File file = new File(chemin);
+                if(file.exists()) {
+
+                    byte buf[] = Files.readAllBytes(file.toPath());
+                    System.out.println("En tete");
+                    out.writeUTF(CONSTANTE.ENVOYER_MEME);
+                    System.out.println("longueur");
+                    out.writeLong(buf.length);
+                    System.out.println("chemin");
+                    out.writeUTF(extension);
+                    System.out.println("Début envoi fichier");
+                    out.write(buf, 0, buf.length);
+                    out.flush();
+                    System.out.println("Fin envoi fichier");
                     return 0;
+
                 }
             }
            return 1;
@@ -364,11 +373,16 @@ public class ClientGUI implements Runnable {
             System.out.println("Reception nouveau meme");
             try {
                 final int index = in.readInt();
-                BufferedImage bImage = ImageIO.read(in);
-                ImageIcon imageIcon = new ImageIcon(bImage);
+                final long length = in.readLong();
+                System.out.println("lengh : " + length);
+                byte[] buf = new byte[Math.toIntExact(length)];
+                in.read(buf);
+                System.out.println(buf);
+                ImageIcon imageIcon = new ImageIcon(buf);
                 Image scaledImage = imageIcon.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
                 ImageIcon iconLogo = new ImageIcon(scaledImage);
                 mMemeToDisplay.get(index).setIcon(iconLogo);
+                System.out.println("FIN");
             } catch (IOException e) {
                 e.printStackTrace();
             }

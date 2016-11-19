@@ -1,6 +1,8 @@
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.invoke.SerializedLambda;
@@ -28,10 +30,10 @@ public class ClientManager implements Runnable {
     private Joueur mJoueur;
     private DataInputStream in;
     private DataOutputStream out;
-    ObjectOutputStream oos;
+    private ObjectOutputStream oos;
 
     private boolean mCanVote = false;
-    private BufferedImage mBufferedImage = null;
+    private byte[] mBytes = null;
 
     public ClientManager(Server s, Socket e, int id){
 
@@ -210,7 +212,6 @@ public class ClientManager implements Runnable {
     private void handleRequests() {
 
         try {
-
             String data = in.readUTF();
             System.out.print("id_req:" + data + "\n");
             switch(data){
@@ -255,39 +256,44 @@ public class ClientManager implements Runnable {
             }
 
         } catch (java.net.SocketException se) {
-            //stopThread = 1;
+            stopThread = 1;
             se.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-            //stopThread = 1;
+            stopThread = 1;
         }
     }
 
     public void recevoirMeme() throws IOException {
 
         System.out.println("Called");
-        mBufferedImage = ImageIO.read(in);
-        String save = "./joueur_" + mId + ".png";
-        System.out.println("blocked");
 
-        File outputfile = new File(save);
-        ImageIO.write(mBufferedImage, "png", outputfile);
+        final long length = in.readLong();
+        final String extension = in.readUTF(); // inutile pour le moment
 
-        System.out.print("Reception meme");
-        if (mBufferedImage != null) {
-            System.out.println("Meme non null");
-        }
+        System.out.println("Length : " + length);
 
+        byte buf[] = new byte[Math.toIntExact(length)];
+        in.read(buf);
+
+        mBytes = buf;
 
     }
 
-    private void diffusion(BufferedImage meme, int joueur) throws IOException{
+    private void diffusion(int i) throws IOException{
 
+        System.out.println("Diffusion meme joueur " + i);
         out.writeUTF(CONSTANTE.DIFFUSION_MEME);
-        out.writeInt(joueur);
-        ImageIO.write(meme, "png", out);
+        System.out.println("Joueur");
+        out.writeInt(i);
+        System.out.println("Longueur");
+        out.writeLong(mBytes.length);
+        System.out.println("Data");
+        out.write(mBytes, 0, mBytes.length);
+        out.flush();
 
     }
+
 
     synchronized public void diffuserMeme() throws IOException{
 
@@ -296,13 +302,13 @@ public class ClientManager implements Runnable {
 
         final int index = joueur.indexOf(this);
 
-        if(mBufferedImage != null) {
+        if(mBytes != null) {
             for (ClientManager cm : audience) {
-                cm.diffusion(mBufferedImage, index);
+                cm.diffusion(index);
             }
 
             for (ClientManager cm : joueur) {
-                cm.diffusion(mBufferedImage, index);
+                cm.diffusion(index);
             }
         }
         else {
