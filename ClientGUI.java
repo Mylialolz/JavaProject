@@ -1,3 +1,5 @@
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -85,9 +87,6 @@ public class ClientGUI implements Runnable {
         mPseudo = pseudo;
         mThread = new Thread(this);
 
-
-
-
         mTabPane.setTitleAt(0, "Chat");
         mTabPane.setTitleAt(1, "Les memes");
 
@@ -131,14 +130,22 @@ public class ClientGUI implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if(mCheckBoxFile.isSelected() && !mCheckBoxURL.isSelected()){
-                    String chemin = mTextFieldCheminMeme.getText();
-                    sendMemeByFile(chemin);
-                }
+                try {
+                    System.out.println("bouton meme");
+                    out.writeUTF(CONSTANTE.ENVOYER_MEME);
 
-                if(!mCheckBoxFile.isSelected() && mCheckBoxURL.isSelected()){
-                    String url = mTextFieldCheminMeme.getText();
-                    sendMemeByURL(url);
+                    if(mCheckBoxFile.isSelected() && !mCheckBoxURL.isSelected()){
+                        String chemin = mTextFieldCheminMeme.getText();
+                        sendMemeByFile(chemin);
+                    }
+
+                    if(!mCheckBoxFile.isSelected() && mCheckBoxURL.isSelected()){
+                        String url = mTextFieldCheminMeme.getText();
+                        sendMemeByURL(url);
+                    }
+
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
 
             }
@@ -230,28 +237,32 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public int sendMemeByFile(String chemin) {
+    public int sendMemeByFile(String chemin) throws IOException {
 
-        try {
+        System.out.println("chemin : " + chemin);
+
+        if(mConnected == true && mEnJeu == true) {
             String extension = "";
             final int i = chemin.lastIndexOf('.');
             if (i > 0) {
-                extension = chemin.substring(i+1);
+                extension = chemin.substring(i + 1);
             }
-
-            if(extension.matches("png") || extension.matches("jpg")) {
-                out.writeUTF(CONSTANTE.ENVOYER_MEME);
+            System.out.println("Extension : " + extension);
+            if (extension.matches("png") || extension.matches("jpg")) {
                 BufferedImage image = ImageIO.read(new File(chemin));
-                ImageIO.write(image, extension, out);
+                if (image != null) {
+                    System.out.println(image);
+                    ImageIO.write(image, extension, out);
+                    System.out.println("Envoi confirmé");
+                    return 0;
+                }
             }
-            return 0;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 1;
+           return 1;
         }
+        return 1;
     }
 
-    public int sendMemeByURL(String URL){
+    public int sendMemeByURL(String URL) throws IOException{
         return 0;
     }
 
@@ -348,6 +359,22 @@ public class ClientGUI implements Runnable {
         }
     }
 
+    public void updateMeme(){
+        if(mEnJeu == true && mConnected == true) {
+            System.out.println("Reception nouveau meme");
+            try {
+                final int index = in.readInt();
+                BufferedImage bImage = ImageIO.read(in);
+                ImageIcon imageIcon = new ImageIcon(bImage);
+                Image scaledImage = imageIcon.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
+                ImageIcon iconLogo = new ImageIcon(scaledImage);
+                mMemeToDisplay.get(index).setIcon(iconLogo);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void run() {
 
@@ -360,8 +387,8 @@ public class ClientGUI implements Runnable {
             while (!fermerConnection) {
 
                 try {
-                    data = in.readUTF();
 
+                    data = in.readUTF();
                     System.out.println("Instruction recue : " + data);
 
                     switch (data) {
@@ -420,25 +447,22 @@ public class ClientGUI implements Runnable {
                             mCanVote = in.readBoolean();
                             break;
                         case CONSTANTE.DIFFUSION_MEME :
-                            final int index = in.readInt();
-                            BufferedImage bImage = ImageIO.read(mSocket.getInputStream());
-                            ImageIcon imageIcon = new ImageIcon(bImage);
-                            Image scaledImage = imageIcon.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
-                            ImageIcon iconLogo = new ImageIcon(scaledImage);
-                            mMemeToDisplay.get(index).setIcon(iconLogo);
+                            updateMeme();
                             break;
                     }
                 } catch (SocketException se) {
                     se.printStackTrace();
+                    fermerConnection = true;
                     break;
                 } catch (IOException e) {
                     e.printStackTrace();
+                    fermerConnection = true;
                 } catch (ClassNotFoundException s) {
                     s.printStackTrace();
+                    fermerConnection = true;
                 }
             }
         }
-
     }
 
     private void gestionCoDecoPartie() throws IOException {
@@ -534,7 +558,7 @@ public class ClientGUI implements Runnable {
             }
             else {
 
-                final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Vous avez déjà voté !",
+                final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Vote indisponible !",
                         "Erreur", JOptionPane.YES_NO_OPTION);
 
             }

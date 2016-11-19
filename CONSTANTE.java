@@ -46,5 +46,7 @@ public class CONSTANTE {
 
     public final static String DIFFUSION_MEME = "d_meme";
 
+    public final static String CONFIRMATION_ENVOI_MEME = "c_e_meme";
+
 
 }

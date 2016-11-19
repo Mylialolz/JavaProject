@@ -248,31 +248,40 @@ public class ClientManager implements Runnable {
                     nouveauVote(false);
                     break;
                 case CONSTANTE.ENVOYER_MEME :
-                    // a completer
+                    System.out.println("recpetion meme");
                     recevoirMeme();
                     diffuserMeme();
                     break;
             }
 
         } catch (java.net.SocketException se) {
-            stopThread = 1;
+            //stopThread = 1;
             se.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-            stopThread = 1;
+            //stopThread = 1;
         }
     }
 
-    public void recevoirMeme() throws IOException{
+    public void recevoirMeme() throws IOException {
 
-        mBufferedImage = ImageIO.read(mSocket.getInputStream());
+        System.out.println("Called");
+        mBufferedImage = ImageIO.read(in);
         String save = "./joueur_" + mId + ".png";
+        System.out.println("blocked");
+
         File outputfile = new File(save);
         ImageIO.write(mBufferedImage, "png", outputfile);
 
+        System.out.print("Reception meme");
+        if (mBufferedImage != null) {
+            System.out.println("Meme non null");
+        }
+
+
     }
 
-    public void getMeme(BufferedImage meme, int joueur) throws IOException{
+    private void diffusion(BufferedImage meme, int joueur) throws IOException{
 
         out.writeUTF(CONSTANTE.DIFFUSION_MEME);
         out.writeInt(joueur);
@@ -287,16 +296,17 @@ public class ClientManager implements Runnable {
 
         final int index = joueur.indexOf(this);
 
-        for(ClientManager cm : audience){
-            if(mBufferedImage != null) {
-                cm.getMeme(mBufferedImage, index);
+        if(mBufferedImage != null) {
+            for (ClientManager cm : audience) {
+                cm.diffusion(mBufferedImage, index);
+            }
+
+            for (ClientManager cm : joueur) {
+                cm.diffusion(mBufferedImage, index);
             }
         }
-
-        for(ClientManager cm : joueur){
-            if(mBufferedImage != null) {
-                cm.getMeme(mBufferedImage, index);
-            }
+        else {
+            System.out.println("Image meme null");
         }
 
     }

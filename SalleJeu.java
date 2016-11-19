@@ -71,7 +71,7 @@ public class SalleJeu{
         joueurs = new ArrayList<>();
         audience = new ArrayList<>();
         tempsAvantPartie = new Timer(850, task);
-        tempsAvantPartie.start();
+        //tempsAvantPartie.start();
     }
 
     synchronized public int addPlayers(ClientManager cm){
