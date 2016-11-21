@@ -33,7 +33,7 @@ public class ClientManager implements Runnable {
     private ObjectOutputStream oos;
 
     private boolean mCanVote = false;
-    private byte[] mBytes = null;
+    private String mMemeURL = null;
 
     public ClientManager(Server s, Socket e, int id){
 
@@ -249,7 +249,6 @@ public class ClientManager implements Runnable {
                     nouveauVote(false);
                     break;
                 case CONSTANTE.ENVOYER_MEME :
-                    System.out.println("recpetion meme");
                     recevoirMeme();
                     diffuserMeme();
                     break;
@@ -264,45 +263,34 @@ public class ClientManager implements Runnable {
         }
     }
 
-    public void recevoirMeme() throws IOException {
+    public int recevoirMeme() throws IOException {
 
-        System.out.println("Called");
+        mMemeURL = null;
+        mMemeURL = in.readUTF();
+        if(mMemeURL != null)
+            return 0;
 
-        final long length = in.readLong();
-        final String extension = in.readUTF(); // inutile pour le moment
-
-        System.out.println("Length : " + length);
-
-        byte buf[] = new byte[Math.toIntExact(length)];
-        in.read(buf);
-
-        mBytes = buf;
-
+        return 1;
     }
 
     private void diffusion(int i) throws IOException{
 
-        System.out.println("Diffusion meme joueur " + i);
+        System.out.println("Diffusion meme joueur url :" + mMemeURL);
         out.writeUTF(CONSTANTE.DIFFUSION_MEME);
-        System.out.println("Joueur");
         out.writeInt(i);
-        System.out.println("Longueur");
-        out.writeLong(mBytes.length);
-        System.out.println("Data");
-        out.write(mBytes, 0, mBytes.length);
-        out.flush();
+        out.writeUTF(mMemeURL);
 
     }
 
 
-    synchronized public void diffuserMeme() throws IOException{
+    public void diffuserMeme() throws IOException{
 
-        ArrayList<ClientManager> audience = mSalleJeu.getAudience();
-        ArrayList<ClientManager> joueur = mSalleJeu.getPlayers();
+        if(mMemeURL != null) {
 
-        final int index = joueur.indexOf(this);
+            ArrayList<ClientManager> audience = mSalleJeu.getAudience();
+            ArrayList<ClientManager> joueur = mSalleJeu.getPlayers();
+            final int index = joueur.indexOf(this);
 
-        if(mBytes != null) {
             for (ClientManager cm : audience) {
                 cm.diffusion(index);
             }
@@ -315,6 +303,8 @@ public class ClientManager implements Runnable {
             System.out.println("Image meme null");
         }
 
+
+        return;
     }
 
     private void connecterPartie() throws IOException {

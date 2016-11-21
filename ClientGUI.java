@@ -1,4 +1,5 @@
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import sun.rmi.server.Activation$ActivationSystemImpl_Stub;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -9,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.net.Socket;
 import java.net.SocketException;
@@ -132,16 +134,8 @@ public class ClientGUI implements Runnable {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    if(mCheckBoxFile.isSelected() && !mCheckBoxURL.isSelected()){
-                        String chemin = mTextFieldCheminMeme.getText();
-                        sendMemeByFile(chemin);
-                    }
 
-                    if(!mCheckBoxFile.isSelected() && mCheckBoxURL.isSelected()){
-                        String url = mTextFieldCheminMeme.getText();
-                        sendMemeByURL(url);
-                    }
-
+                    sendMemeURL(mTextFieldCheminMeme.getText());
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -235,44 +229,15 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public int sendMemeByFile(String chemin) throws IOException {
+    public int sendMemeURL(String chemin) throws IOException {
 
-        System.out.println("chemin : " + chemin);
-
-        if(mConnected == true && mEnJeu == true) {
-            String extension = "";
-            final int i = chemin.lastIndexOf('.');
-            if (i > 0) {
-                extension = chemin.substring(i + 1);
-            }
-            System.out.println("Extension : " + extension);
-            if (extension.matches("png") || extension.matches("jpg")) {
-
-                File file = new File(chemin);
-                if(file.exists()) {
-
-                    byte buf[] = Files.readAllBytes(file.toPath());
-                    System.out.println("En tete");
-                    out.writeUTF(CONSTANTE.ENVOYER_MEME);
-                    System.out.println("longueur");
-                    out.writeLong(buf.length);
-                    System.out.println("chemin");
-                    out.writeUTF(extension);
-                    System.out.println("Début envoi fichier");
-                    out.write(buf, 0, buf.length);
-                    out.flush();
-                    System.out.println("Fin envoi fichier");
-                    return 0;
-
-                }
-            }
-           return 1;
+        if (mConnected == true && mEnJeu == true) {
+            out.writeUTF(CONSTANTE.ENVOYER_MEME);
+            out.writeUTF(chemin);
+            return 0;
         }
-        return 1;
-    }
 
-    public int sendMemeByURL(String URL) throws IOException{
-        return 0;
+        return 1;
     }
 
     public void envoyerMessageChat(String message){
@@ -368,31 +333,49 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public void updateMeme(){
+    public void updateMeme(int idJoueur) throws IOException{
+
         if(mEnJeu == true && mConnected == true) {
-            System.out.println("Reception nouveau meme");
-            try {
-                final int index = in.readInt();
-                final long length = in.readLong();
-                System.out.println("lengh : " + length);
-                byte[] buf = new byte[Math.toIntExact(length)];
-                in.read(buf);
-                System.out.println(buf);
-                ImageIcon imageIcon = new ImageIcon(buf);
-                Image scaledImage = imageIcon.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
-                ImageIcon iconLogo = new ImageIcon(scaledImage);
-                mMemeToDisplay.get(index).setIcon(iconLogo);
-                System.out.println("FIN");
-            } catch (IOException e) {
-                e.printStackTrace();
+            final String urlString = in.readUTF();
+            if(urlString  != null){
+
+                final String finalUrl = mettreEnFormeURL(urlString);
+
+                if(finalUrl != null) {
+
+                    Image image = null;
+                    URL url = new URL(finalUrl);
+
+                    if (url != null) {
+
+                        image = ImageIO.read(url);
+                        Image scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
+
+                        mMemeToDisplay.get(idJoueur).setIcon(new ImageIcon(scaledImage));
+
+                    }
+                }
             }
+
         }
+    }
+
+    private String mettreEnFormeURL(String URL) throws IOException{
+        String ret = null;
+        if(URL != null){
+            ret = "";
+            ret += "http://i.imgflip.com/";
+            final int index= URL.lastIndexOf('/');
+            final String imgRoute = URL.substring(index+1);
+            ret += imgRoute;
+            System.out.print("ret : " + ret);
+        }
+        return ret;
     }
 
     @Override
     public void run() {
 
-        boolean erreur = false;
         boolean fermerConnection = false;
         String data = "";
 
@@ -461,7 +444,7 @@ public class ClientGUI implements Runnable {
                             mCanVote = in.readBoolean();
                             break;
                         case CONSTANTE.DIFFUSION_MEME :
-                            updateMeme();
+                            updateMeme(in.readInt());
                             break;
                     }
                 } catch (SocketException se) {
