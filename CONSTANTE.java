@@ -48,5 +48,12 @@ public class CONSTANTE {
 
     public final static String CONFIRMATION_ENVOI_MEME = "c_e_meme";
 
+    public final static String USERNAME = "meme_competitor";
+
+    public final static String PASSWORD = "memecompetitor";
+
+    public final static String LANGUAGE_CODE = "en";
+
+    public final static String URL_INSTANCE_CREATE = "http://version1.api.memegenerator.net/Instance_Create";
 
 }
