@@ -30,6 +30,8 @@ public class ClientGUI implements Runnable {
 
     private ArrayList<JLabel> mMemeToDisplay;
     private ArrayList<JLabel> mMemeGeneratorSearchToDisplay;
+    private ArrayList<ResearchMemeListe> mResearchMemeList;
+
     private int pageIndex = 0;
 
     private final String mIp;
@@ -401,6 +403,7 @@ public class ClientGUI implements Runnable {
             s = s.substring(0, indexEspace);
         }
         ArrayList<ResearchMemeListe> array = Meme.researchMemes(s, page);
+        mResearchMemeList = array;
 
         if(array != null){
             int l = 0;
@@ -564,8 +567,6 @@ public class ClientGUI implements Runnable {
 
         for(int i = 0; i < 6; i++) {
 
-            //ImageIcon iconLogo = new ImageIcon("C:\\Users\\Antoine\\Desktop\\oiseau.jpg");
-            //Image scaledImage = iconLogo.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
             JLabel label = new JLabel();
             label.setIcon(null);
             mMemeToDisplay.add(label);
@@ -634,7 +635,14 @@ public class ClientGUI implements Runnable {
                     null, options, null);
             if (result == JOptionPane.YES_OPTION) {
 
-                System.out.println("Vote envoye");
+                String upperText = textFieldUpper.getText();
+                String lowerText = textFieldLower.getText();
+                String generatorId = mResearchMemeList.get(i).getGeneratorId();
+                String imgId = mResearchMemeList.get(i).getImageId();
+
+                Meme meme = new Meme(generatorId, imgId, upperText, lowerText);
+                String memeUrl = meme.getMemeURL();
+                System.out.println("memeUrl : " + memeUrl);
 
             }
         }

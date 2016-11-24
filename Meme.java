@@ -84,10 +84,13 @@ public class Meme {
     private void getMeme(String request){
 
        String strJSON = UrlHandler.retrieveDataFromUrl(request);
+        System.out.println("strJSON : " + strJSON);
         Gson gson = new Gson();
         JsonElement element = gson.fromJson (strJSON, JsonElement.class);
         JsonObject jsonObj = element.getAsJsonObject();
-        JsonArray result = jsonObj.getAsJsonArray("result");
+        System.out.println(jsonObj);
+        JsonObject result = jsonObj.getAsJsonObject("result");
+        System.out.println("result : " + result);
         CreatedMeme meme =  gson.fromJson(result, CreatedMeme.class);
         memeURL = meme.getInstanceImageUrl();
     }

@@ -32,7 +32,7 @@ public class ResearchMemeListe {
         if(imageUrl != null){
             final int index = imageUrl.lastIndexOf('/');
             ret = imageUrl.substring(index + 1);
-            final int indexEx = imageUrl.indexOf('.');
+            final int indexEx = ret.lastIndexOf('.');
             ret = ret.substring(0, indexEx);
             System.out.println("ret : " + ret);
         }
