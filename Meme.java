@@ -1,12 +1,15 @@
 import java.awt.*;
 import java.util.ArrayList;
-
 import com.google.gson.*;
-import org.json.*;
 
 /**
  * Created by Joris on 23/11/2016.
  */
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import com.google.gson.*;
+
 public class Meme {
 
     private String memeURL;
@@ -26,6 +29,7 @@ public class Meme {
         text0 = txt0;
         text1 = txt1;
         String request = createMeme();
+        getMeme(request);
     }
 
     public Meme(String genID, String imaID, String txt0){
@@ -35,6 +39,7 @@ public class Meme {
         text0 = txt0;
         text1 = null;
         String request = createMeme();
+        getMeme(request);
 
     }
 
@@ -75,6 +80,17 @@ public class Meme {
         String requestedURL = CONSTANTE.URL_INSTANCE_CREATE + "?username=" + CONSTANTE.USERNAME + "&password=" + CONSTANTE.PASSWORD + "&languageCode=" + CONSTANTE.LANGUAGE_CODE
                             + "&generatorID=" + generatorID + "&imageID=" + imageID + "&text0=" + text0 + "&text1=" + text1;
         return requestedURL;
+    }
+
+    private void getMeme(String request){
+
+       String strJSON = UrlHandler.retrieveDataFromUrl(request);
+        Gson gson = new Gson();
+        JsonElement element = gson.fromJson (strJSON, JsonElement.class);
+        JsonObject jsonObj = element.getAsJsonObject();
+        JsonArray result = jsonObj.getAsJsonArray("result");
+        CreatedMeme meme =  gson.fromJson(result, CreatedMeme.class);
+        memeURL = meme.getInstanceImageUrl();
     }
 }
 //TODO Lancer la requête, récupérer le JSON, Stocker l'URL du meme dans l'attribut memeURL
