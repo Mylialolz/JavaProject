@@ -15,8 +15,7 @@ public class Meme {
     private String text0; // Top text (or bottom if text1 is empty
     private String text1; // Bottom text
 
-    private static int pageSize = 24;
-    private static int pageIndex = 0;
+    private static int pageSize = 6;
 
 
     public Meme(String genID, String imaID, String txt0, String txt1){
@@ -38,16 +37,16 @@ public class Meme {
 
     }
 
-    public static ArrayList<ResearchMemeListe> researchMemes(String memeName){
+    public static ArrayList<ResearchMemeListe> researchMemes(String memeName, int page){
 
         ArrayList<ResearchMemeListe> retList = null;
 
         if(memeName != null) {
 
-            String req = CONSTANTE.URL_GENERATOR_SEARCH + "?q=" + memeName + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
-            System.out.println("req : " + req);
+            String req = CONSTANTE.URL_GENERATOR_SEARCH + "?q=" + memeName + "&pageIndex=" + page + "&pageSize=" + pageSize;
+            //System.out.println("req : " + req);
             String responseFromAPI = UrlHandler.retrieveDataFromUrl(req);
-            System.out.println("res : " + responseFromAPI);
+            //System.out.println("res : " + responseFromAPI);
             retList = new ArrayList<>();
 
             if (retList != null && responseFromAPI != null) {

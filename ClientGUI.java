@@ -30,7 +30,7 @@ public class ClientGUI implements Runnable {
 
     private ArrayList<JLabel> mMemeToDisplay;
     private ArrayList<JLabel> mMemeGeneratorSearchToDisplay;
-    private int stopIndexGeneratorSearch = 0;
+    private int pageIndex = 0;
 
     private final String mIp;
     private final int mPort;
@@ -82,6 +82,7 @@ public class ClientGUI implements Runnable {
     private JPanel mPaneGeneratorSearchMeme;
     private JButton mButtonSuivantGenerator;
     private JButton mButtonPrecedentGenerator;
+    private JLabel mLabelIndicationMemeGeneratorSearch;
     private JList mJListSalleJeu;
     private GridLayout mGridMemeLayout;
     private GridLayout mGridGeneratorSearchLayout;
@@ -153,21 +154,24 @@ public class ClientGUI implements Runnable {
         mButtonSearchGeneratorMeme.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                visualiserMeme(1);
+                pageIndex = 0;
+                visualiserMeme(pageIndex);
             }
         });
 
         mButtonSuivantGenerator.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                visualiserMeme(1);
+                pageIndex++;
+                visualiserMeme(pageIndex);
             }
         });
 
         mButtonPrecedentGenerator.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                visualiserMeme(-1);
+                pageIndex--;
+                visualiserMeme(pageIndex);
             }
         });
 
@@ -401,26 +405,19 @@ public class ClientGUI implements Runnable {
         return ret;
     }
 
-    private void visualiserMeme(int code){
+    private void visualiserMeme(int page){
 
-        ArrayList<ResearchMemeListe> array = Meme.researchMemes(mTextFieldGeneratorSearchMeme.getText());
-        int beginIndex = 0;
-        int endIndex = 0;
+        mLabelIndicationMemeGeneratorSearch.setText("Chargement en cours ...");
 
-        if(code > 0){
-            beginIndex = stopIndexGeneratorSearch;
-            stopIndexGeneratorSearch += 6;
-            endIndex = stopIndexGeneratorSearch;
+        String s = mTextFieldGeneratorSearchMeme.getText();
+        final int indexEspace = s.indexOf(' ');
+        if(indexEspace > 0) {
+            s = s.substring(0, indexEspace);
         }
-        else if (code <= 0){
-            endIndex = stopIndexGeneratorSearch;
-            stopIndexGeneratorSearch -= 6;
-            beginIndex = stopIndexGeneratorSearch;
-        }
+        ArrayList<ResearchMemeListe> array = Meme.researchMemes(s, page);
 
         if(array != null){
-            int l = 0;
-            for(int i = beginIndex; i < endIndex && i < array.size(); i++){
+            for(int i = 0; i < array.size(); i++){
                String imageURL = array.get(i).getImageUrl();
                 Image image = null;
                 try {
@@ -428,21 +425,19 @@ public class ClientGUI implements Runnable {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println(image);
+                //System.out.println(image);
                 Image scaledImage = null;
                 if(image != null) {
                     scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
                 }
                 else {
-                    System.out.println("Image null");
                 }
                 if(scaledImage != null) {
-                    System.out.println("Ok");
-                    mMemeGeneratorSearchToDisplay.get(l).setIcon(new ImageIcon(scaledImage));
+                    mMemeGeneratorSearchToDisplay.get(i).setIcon(new ImageIcon(scaledImage));
                 }
-                l++;
             }
         }
+        mLabelIndicationMemeGeneratorSearch.setText("Chargement terminé.");
 
 
     }
@@ -584,12 +579,10 @@ public class ClientGUI implements Runnable {
 
         for(int i = 0; i < 6; i++) {
 
-            ImageIcon iconLogo = new ImageIcon("C:\\Users\\Antoine\\Desktop\\oiseau.jpg");
-
-            Image scaledImage = iconLogo.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
-
+            //ImageIcon iconLogo = new ImageIcon("C:\\Users\\Antoine\\Desktop\\oiseau.jpg");
+            //Image scaledImage = iconLogo.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
             JLabel label = new JLabel();
-            label.setIcon(new ImageIcon(scaledImage));
+            label.setIcon(null);
             mMemeToDisplay.add(label);
 
             int finalI = i;
@@ -613,10 +606,6 @@ public class ClientGUI implements Runnable {
         mMemeGeneratorSearchToDisplay = new ArrayList<>();
 
         for(int i = 0; i < 6 ; i++){
-            ImageIcon iconLogo = new ImageIcon("C:\\Users\\Antoine\\Desktop\\oiseau.jpg");
-
-            Image scaledImage = iconLogo.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
-
             JLabel label = new JLabel();
             label.setIcon(null);
             mMemeGeneratorSearchToDisplay.add(label);

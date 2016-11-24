@@ -269,9 +269,15 @@
                           <text value="Précèdent"/>
                         </properties>
                       </component>
+                      <component id="33ee6" class="javax.swing.JLabel" binding="mLabelIndicationMemeGeneratorSearch">
+                        <constraints/>
+                        <properties>
+                          <text value="Indications de chargement"/>
+                        </properties>
+                      </component>
                     </children>
                   </grid>
-                  <grid id="a95bb" binding="mPaneGeneratorSearchMeme" layout-manager="GridBagLayout">
+                  <grid id="a95bb" binding="mPaneGeneratorSearchMeme" custom-create="true" layout-manager="GridBagLayout">
                     <constraints border-constraint="Center"/>
                     <properties/>
                     <border type="none"/>
