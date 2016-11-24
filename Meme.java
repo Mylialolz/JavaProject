@@ -1,3 +1,9 @@
+import java.awt.*;
+import java.util.ArrayList;
+
+import com.google.gson.*;
+import org.json.*;
+
 /**
  * Created by Joris on 23/11/2016.
  */
@@ -8,6 +14,9 @@ public class Meme {
     private String imageID; // ID of the image (contained at the end of imageURL)
     private String text0; // Top text (or bottom if text1 is empty
     private String text1; // Bottom text
+
+    private static int pageSize = 24;
+    private static int pageIndex = 0;
 
 
     public Meme(String genID, String imaID, String txt0, String txt1){
@@ -28,6 +37,38 @@ public class Meme {
         String request = createMeme();
 
     }
+
+    public static ArrayList<ResearchMemeListe> researchMemes(String memeName){
+
+        ArrayList<ResearchMemeListe> retList = null;
+
+        if(memeName != null) {
+
+            String req = CONSTANTE.URL_GENERATOR_SEARCH + "?q=" + memeName + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
+            System.out.println("req : " + req);
+            String responseFromAPI = UrlHandler.retrieveDataFromUrl(req);
+            System.out.println("res : " + responseFromAPI);
+            retList = new ArrayList<>();
+
+            if (retList != null && responseFromAPI != null) {
+
+                Gson gson = new Gson();
+                JsonElement element = gson.fromJson (responseFromAPI, JsonElement.class);
+                JsonObject jsonObj = element.getAsJsonObject();
+                JsonArray result = jsonObj.getAsJsonArray("result");
+
+                for(int i = 0; i < result.size(); i++){
+                    JsonElement currentJsonObj = result.get(i);
+                    System.out.println(currentJsonObj);
+                    ResearchMemeListe data = gson.fromJson(currentJsonObj, ResearchMemeListe.class);
+                    retList.add(data);
+                }
+            }
+        }
+
+        return retList;
+    }
+
 
     private String createMeme(){
 

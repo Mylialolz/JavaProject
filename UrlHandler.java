@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,6 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.google.gson.*;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 /**
  * Created by Antoine on 18/10/2016.
@@ -71,6 +76,19 @@ public class UrlHandler {
             ret = null;
         }
         return ret;
+    }
+
+
+    public static Image getImageFromURL(String url) throws IOException {
+
+        Image image = null;
+        URL finalUrl = new URL(url);
+
+        if (url != null && finalUrl != null) {
+            image = ImageIO.read(finalUrl);
+        }
+
+        return image;
     }
 
 

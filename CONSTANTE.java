@@ -56,4 +56,6 @@ public class CONSTANTE {
 
     public final static String URL_INSTANCE_CREATE = "http://version1.api.memegenerator.net/Instance_Create";
 
+    public final static String URL_GENERATOR_SEARCH = "http://version1.api.memegenerator.net/Generators_Search";
+
 }

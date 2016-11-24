@@ -4,10 +4,7 @@ import sun.rmi.server.Activation$ActivationSystemImpl_Stub;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
@@ -32,6 +29,8 @@ public class ClientGUI implements Runnable {
     private DefaultListModel mDefaultlistScore;
 
     private ArrayList<JLabel> mMemeToDisplay;
+    private ArrayList<JLabel> mMemeGeneratorSearchToDisplay;
+    private int stopIndexGeneratorSearch = 0;
 
     private final String mIp;
     private final int mPort;
@@ -77,8 +76,15 @@ public class ClientGUI implements Runnable {
     private JCheckBox mCheckBoxFile;
     private JCheckBox mCheckBoxURL;
     private JLabel mMessageAvantPartie;
+    private JTextField mTextFieldGeneratorSearchMeme;
+    private JButton mButtonSearchGeneratorMeme;
+    private JScrollBar mScrollBarGeneratorSearch;
+    private JPanel mPaneGeneratorSearchMeme;
+    private JButton mButtonSuivantGenerator;
+    private JButton mButtonPrecedentGenerator;
     private JList mJListSalleJeu;
     private GridLayout mGridMemeLayout;
+    private GridLayout mGridGeneratorSearchLayout;
     private double width;
     private double height;
 
@@ -141,6 +147,27 @@ public class ClientGUI implements Runnable {
                     e1.printStackTrace();
                 }
 
+            }
+        });
+
+        mButtonSearchGeneratorMeme.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                visualiserMeme(1);
+            }
+        });
+
+        mButtonSuivantGenerator.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                visualiserMeme(1);
+            }
+        });
+
+        mButtonPrecedentGenerator.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                visualiserMeme(-1);
             }
         });
 
@@ -374,6 +401,54 @@ public class ClientGUI implements Runnable {
         return ret;
     }
 
+    private void visualiserMeme(int code){
+
+        ArrayList<ResearchMemeListe> array = Meme.researchMemes(mTextFieldGeneratorSearchMeme.getText());
+        int beginIndex = 0;
+        int endIndex = 0;
+
+        if(code > 0){
+            beginIndex = stopIndexGeneratorSearch;
+            stopIndexGeneratorSearch += 6;
+            endIndex = stopIndexGeneratorSearch;
+        }
+        else if (code <= 0){
+            endIndex = stopIndexGeneratorSearch;
+            stopIndexGeneratorSearch -= 6;
+            beginIndex = stopIndexGeneratorSearch;
+        }
+
+        if(array != null){
+            int l = 0;
+            for(int i = beginIndex; i < endIndex && i < array.size(); i++){
+               String imageURL = array.get(i).getImageUrl();
+                Image image = null;
+                try {
+                    image = UrlHandler.getImageFromURL(imageURL);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(image);
+                Image scaledImage = null;
+                if(image != null) {
+                    scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
+                }
+                else {
+                    System.out.println("Image null");
+                }
+                if(scaledImage != null) {
+                    System.out.println("Ok");
+                    mMemeGeneratorSearchToDisplay.get(l).setIcon(new ImageIcon(scaledImage));
+                }
+                l++;
+            }
+        }
+
+
+    }
+
+
+
     @Override
     public void run() {
 
@@ -532,6 +607,23 @@ public class ClientGUI implements Runnable {
             mPaneMeme.add(label);
 
         }
+
+        mGridGeneratorSearchLayout = new GridLayout(2,3);
+        mPaneGeneratorSearchMeme = new JPanel(mGridGeneratorSearchLayout);
+        mMemeGeneratorSearchToDisplay = new ArrayList<>();
+
+        for(int i = 0; i < 6 ; i++){
+            ImageIcon iconLogo = new ImageIcon("C:\\Users\\Antoine\\Desktop\\oiseau.jpg");
+
+            Image scaledImage = iconLogo.getImage().getScaledInstance((int)width/6, (int)height/4, Image.SCALE_SMOOTH);
+
+            JLabel label = new JLabel();
+            label.setIcon(null);
+            mMemeGeneratorSearchToDisplay.add(label);
+            mPaneGeneratorSearchMeme.add(label);
+        }
+
+
     }
 
     public void envoyerVote(int i) {

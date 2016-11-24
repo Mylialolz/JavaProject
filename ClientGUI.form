@@ -233,14 +233,51 @@
                 <border type="none"/>
                 <children/>
               </grid>
-              <grid id="e5637" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                <margin top="0" left="0" bottom="0" right="0"/>
+              <grid id="e5637" layout-manager="BorderLayout" hgap="0" vgap="0">
                 <constraints>
                   <tabbedpane title="Untitled"/>
                 </constraints>
                 <properties/>
                 <border type="none"/>
-                <children/>
+                <children>
+                  <grid id="c6f9c" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                    <constraints border-constraint="South"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="21428" class="javax.swing.JTextField" binding="mTextFieldGeneratorSearchMeme">
+                        <constraints/>
+                        <properties>
+                          <columns value="25"/>
+                        </properties>
+                      </component>
+                      <component id="43f43" class="javax.swing.JButton" binding="mButtonSearchGeneratorMeme">
+                        <constraints/>
+                        <properties>
+                          <text value="Visualisation"/>
+                        </properties>
+                      </component>
+                      <component id="3e79" class="javax.swing.JButton" binding="mButtonSuivantGenerator">
+                        <constraints/>
+                        <properties>
+                          <text value="Suivant"/>
+                        </properties>
+                      </component>
+                      <component id="7b3bd" class="javax.swing.JButton" binding="mButtonPrecedentGenerator">
+                        <constraints/>
+                        <properties>
+                          <text value="Précèdent"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="a95bb" binding="mPaneGeneratorSearchMeme" layout-manager="GridBagLayout">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children/>
+                  </grid>
+                </children>
               </grid>
             </children>
           </tabbedpane>
