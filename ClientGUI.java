@@ -83,6 +83,7 @@ public class ClientGUI implements Runnable {
     private JButton mButtonSuivantGenerator;
     private JButton mButtonPrecedentGenerator;
     private JLabel mLabelIndicationMemeGeneratorSearch;
+    private JPanel mMainPaneSearchGenerator;
     private JList mJListSalleJeu;
     private GridLayout mGridMemeLayout;
     private GridLayout mGridGeneratorSearchLayout;
@@ -365,44 +366,20 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public void updateMeme(int idJoueur) throws IOException{
+    public void updateMeme(int idJoueur) throws IOException {
 
-        if(mEnJeu == true && mConnected == true) {
+        if (mEnJeu == true && mConnected == true) {
+
             final String urlString = in.readUTF();
-            if(urlString  != null){
 
-                final String finalUrl = mettreEnFormeURL(urlString);
+            if (urlString != null) {
 
-                if(finalUrl != null) {
+                Image image = UrlHandler.getImageFromURL(urlString);
+                Image scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
+                mMemeToDisplay.get(idJoueur).setIcon(new ImageIcon(scaledImage));
 
-                    Image image = null;
-                    URL url = new URL(finalUrl);
-
-                    if (url != null) {
-
-                        image = ImageIO.read(url);
-                        Image scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
-
-                        mMemeToDisplay.get(idJoueur).setIcon(new ImageIcon(scaledImage));
-
-                    }
-                }
             }
-
         }
-    }
-
-    private String mettreEnFormeURL(String URL) throws IOException{
-        String ret = null;
-        if(URL != null){
-            ret = "";
-            ret += "http://i.imgflip.com/";
-            final int index= URL.lastIndexOf('/');
-            final String imgRoute = URL.substring(index+1);
-            ret += imgRoute;
-            System.out.print("ret : " + ret);
-        }
-        return ret;
     }
 
     private void visualiserMeme(int page){
@@ -417,6 +394,7 @@ public class ClientGUI implements Runnable {
         ArrayList<ResearchMemeListe> array = Meme.researchMemes(s, page);
 
         if(array != null){
+            int l = 0;
             for(int i = 0; i < array.size(); i++){
                String imageURL = array.get(i).getImageUrl();
                 Image image = null;
@@ -425,7 +403,6 @@ public class ClientGUI implements Runnable {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                //System.out.println(image);
                 Image scaledImage = null;
                 if(image != null) {
                     scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
@@ -433,7 +410,8 @@ public class ClientGUI implements Runnable {
                 else {
                 }
                 if(scaledImage != null) {
-                    mMemeGeneratorSearchToDisplay.get(i).setIcon(new ImageIcon(scaledImage));
+                    mMemeGeneratorSearchToDisplay.get(l).setIcon(new ImageIcon(scaledImage));
+                    l++;
                 }
             }
         }
@@ -441,8 +419,6 @@ public class ClientGUI implements Runnable {
 
 
     }
-
-
 
     @Override
     public void run() {
@@ -592,7 +568,7 @@ public class ClientGUI implements Runnable {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if(e.getClickCount() == 2 || SwingUtilities.isRightMouseButton(e)){
-                        envoyerVote(index);
+                            envoyerVote(index);
                     }
                 }
             });
@@ -606,20 +582,64 @@ public class ClientGUI implements Runnable {
         mMemeGeneratorSearchToDisplay = new ArrayList<>();
 
         for(int i = 0; i < 6 ; i++){
+
             JLabel label = new JLabel();
             label.setIcon(null);
+            int finalI = i;
+
+            label.addMouseListener(new MouseAdapter() {
+                private int index = finalI;
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if(e.getClickCount() == 2 || SwingUtilities.isRightMouseButton(e)){
+                            creerMeme(index);
+                    }
+                }
+            });
+
             mMemeGeneratorSearchToDisplay.add(label);
             mPaneGeneratorSearchMeme.add(label);
+
         }
 
 
     }
 
+
+    public void creerMeme(int i){
+
+
+        if(mMemeGeneratorSearchToDisplay.get(i).getIcon() != null) {
+            String[] options = {"Creer Meme", "Annuler"};
+            JPanel panel = new JPanel();
+            panel.add(new JLabel("Upper Text :"));
+            JTextField textFieldUpper = new JTextField(25);
+            panel.add(textFieldUpper);
+
+            panel.add(new JLabel("Lower Text :"));
+            JTextField textFieldLower = new JTextField(25);
+            panel.add(textFieldLower);
+
+            int result = JOptionPane.showOptionDialog(null, panel, "Enter a Number",
+                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+                    null, options, null);
+            if (result == JOptionPane.YES_OPTION) {
+
+                System.out.println("Vote envoye");
+
+            }
+        }
+
+
+    }
+
+
+
     public void envoyerVote(int i) {
 
         if (mConnected && mEnJeu) {
 
-            if(mCanVote) {
+            if(mCanVote && mMemeToDisplay.get(i).getIcon() != null) {
 
                 final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Veuillez confirmer votre vote pour ce meme",
                         "Confirmation du vote", JOptionPane.YES_NO_OPTION);

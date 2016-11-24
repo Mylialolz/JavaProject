@@ -91,5 +91,11 @@ public class Meme {
         CreatedMeme meme =  gson.fromJson(result, CreatedMeme.class);
         memeURL = meme.getInstanceImageUrl();
     }
+
+
+    public String getMemeURL(){
+        return memeURL;
+    }
+
 }
 //TODO Lancer la requête, récupérer le JSON, Stocker l'URL du meme dans l'attribut memeURL
