@@ -92,4 +92,3 @@ public class Meme {
         memeURL = meme.getInstanceImageUrl();
     }
 }
-//TODO Lancer la requête, récupérer le JSON, Stocker l'URL du meme dans l'attribut memeURL
