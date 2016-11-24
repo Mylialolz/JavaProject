@@ -91,7 +91,8 @@ public class ClientGUI implements Runnable {
         mThread = new Thread(this);
 
         mTabPane.setTitleAt(0, "Chat");
-        mTabPane.setTitleAt(1, "Les memes");
+        mTabPane.setTitleAt(1, "Partie");
+        mTabPane.setTitleAt(2, "Les memes");
 
         mButtonEnvoyerMessage.addActionListener(new ActionListener() {
             @Override

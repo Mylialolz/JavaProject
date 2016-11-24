@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.google.gson.*;
+
 /**
  * Created by Antoine on 18/10/2016.
  */
@@ -59,6 +61,17 @@ public class UrlHandler {
         return ret;
     }
 
+
+    public static String getJson(String url){
+        String ret = retrieveDataFromUrl(url);
+        if(!ret.matches("") || ret != null){
+
+        }
+        else {
+            ret = null;
+        }
+        return ret;
+    }
 
 
 }
