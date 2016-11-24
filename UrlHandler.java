@@ -67,18 +67,6 @@ public class UrlHandler {
     }
 
 
-    public static String getJson(String url){
-        String ret = retrieveDataFromUrl(url);
-        if(!ret.matches("") || ret != null){
-
-        }
-        else {
-            ret = null;
-        }
-        return ret;
-    }
-
-
     public static Image getImageFromURL(String url) throws IOException {
 
         Image image = null;
