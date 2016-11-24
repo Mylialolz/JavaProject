@@ -34,7 +34,7 @@ public class ClientGUI implements Runnable {
 
     private final String mIp;
     private final int mPort;
-    private final String mPseudo;
+    private String mPseudo;
 
     private Socket mSocket;
     private boolean mConnected;
@@ -91,11 +91,10 @@ public class ClientGUI implements Runnable {
     private double height;
 
 
-    public ClientGUI(String ip, int port, String pseudo) {
+    public ClientGUI(String ip, int port) {
         mIp = ip;
         mPort = port;
         mConnected = false;
-        mPseudo = pseudo;
         mThread = new Thread(this);
 
         mTabPane.setTitleAt(0, "Chat");
@@ -113,7 +112,17 @@ public class ClientGUI implements Runnable {
         mButtonConnectionServer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                connect();
+                String s = (String)JOptionPane.showInputDialog(
+                        mButtonConnectionServer,
+                        "Entrez votre pseudo",
+                        JOptionPane.QUESTION_MESSAGE);
+                if ((s != null) && (s.length() > 0)){
+                    mPseudo = s;
+                }
+                else{
+                    mPseudo = "Unknown";
+                }
+                    connect();
             }
         });
 

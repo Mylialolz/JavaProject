@@ -10,7 +10,7 @@ public class MainClient {
         final int port = 1234;
         final String ip = "localhost";
 
-        ClientGUI clientGUI = new ClientGUI(ip, port, "Antoine");
+        ClientGUI clientGUI = new ClientGUI(ip, port);
 
         JFrame frame = new JFrame("meme competitor");
         frame.setContentPane(clientGUI.getMainPanel());
