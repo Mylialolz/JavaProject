@@ -382,6 +382,7 @@ public class ClientGUI implements Runnable {
         if (mEnJeu == true && mConnected == true) {
 
             final String urlString = in.readUTF();
+            System.out.println("URL : " + urlString);
 
             if (urlString != null) {
 
@@ -503,12 +504,14 @@ public class ClientGUI implements Runnable {
                             mCanVote = in.readBoolean();
                             break;
                         case CONSTANTE.DIFFUSION_MEME :
-                            updateMeme(in.readInt());
+                            System.out.println("Diffusion");
+                            int j = in.readInt();
+                            System.out.println("id joueur : " + j);
+                            updateMeme(j);
                             break;
                     }
                 } catch (SocketException se) {
                     se.printStackTrace();
-                    fermerConnection = true;
                     break;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -602,7 +605,11 @@ public class ClientGUI implements Runnable {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if(e.getClickCount() == 2 || SwingUtilities.isRightMouseButton(e)){
+                        try {
                             creerMeme(index);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 }
             });
@@ -615,8 +622,7 @@ public class ClientGUI implements Runnable {
 
     }
 
-
-    public void creerMeme(int i){
+    public void creerMeme(int i) throws IOException{
 
 
         if(mMemeGeneratorSearchToDisplay.get(i).getIcon() != null) {
@@ -644,13 +650,15 @@ public class ClientGUI implements Runnable {
                 String memeUrl = meme.getMemeURL();
                 System.out.println("memeUrl : " + memeUrl);
 
+                if(mEnJeu && mConnected){
+                    out.writeUTF(CONSTANTE.ENVOYER_MEME);
+                    out.writeUTF(memeUrl);
+                }
             }
         }
 
 
     }
-
-
 
     public void envoyerVote(int i) {
 

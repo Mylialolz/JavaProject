@@ -263,7 +263,7 @@ public class ClientManager implements Runnable {
         }
     }
 
-    public int recevoirMeme() throws IOException {
+    synchronized public int recevoirMeme() throws IOException {
 
         mMemeURL = null;
         mMemeURL = in.readUTF();
@@ -273,23 +273,29 @@ public class ClientManager implements Runnable {
         return 1;
     }
 
-    private void diffusion(int i) throws IOException{
+    synchronized public void diffusion(int i) throws IOException{
 
-        System.out.println("Diffusion meme joueur url :" + mMemeURL);
         out.writeUTF(CONSTANTE.DIFFUSION_MEME);
         out.writeInt(i);
-        out.writeUTF(mMemeURL);
+        String copy = mMemeURL;
+        out.writeUTF(copy);
 
     }
 
 
-    public void diffuserMeme() throws IOException{
+    synchronized public void diffuserMeme() throws IOException{
 
         if(mMemeURL != null) {
 
             ArrayList<ClientManager> audience = mSalleJeu.getAudience();
             ArrayList<ClientManager> joueur = mSalleJeu.getPlayers();
+
+            System.out.println(joueur);
+
             final int index = joueur.indexOf(this);
+
+            System.out.println("Id joueur : " + index);
+            System.out.println("Diffusion du meme : " + mMemeURL);
 
             for (ClientManager cm : audience) {
                 cm.diffusion(index);

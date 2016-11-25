@@ -45,6 +45,7 @@ public class GameLoop {
                 else {
                     setCompteurPhase(0);
                     setIndicePhase(1);
+                    mRound++;
                 }
             }
 
@@ -69,6 +70,7 @@ public class GameLoop {
     public void arreterPartie(){
         if(t.isRunning()){
             t.stop();
+            mSalle.arreterPartie();
         }
     }
 

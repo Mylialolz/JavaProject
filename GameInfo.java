@@ -33,27 +33,35 @@ public class GameInfo implements Runnable {
                 final int timer = mSalle.getTimeInPhase();
                 final int nbRound = mSalle.getNumRound();
 
-                for(ClientManager cm : mSalle.getAudience()){
-                    cm.envoyerTableauScores();
-                    cm.envoyerScorePerso();
-                    cm.envoyerNumeroPhase(phase);
-                    cm.envoyerTimerPhase(timer);
-                    cm.envoyerNbRound(nbRound);
-                }
-
-                for(ClientManager cm : mSalle.getPlayers()){
-                    cm.envoyerTableauScores();
-                    cm.envoyerScorePerso();
-                    cm.envoyerNumeroPhase(phase);
-                    cm.envoyerTimerPhase(timer);
-                    cm.envoyerNbRound(nbRound);
-                }
+                donneesJeu(phase, timer, nbRound);
 
                 Thread.sleep(1000);
+
+                if(mSalle.getNbPlayers() < 1){
+                    mSalle.arreterPartie();
+                }
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    synchronized private void donneesJeu(int phase, int timer, int nbRound) {
+        for(ClientManager cm : mSalle.getAudience()){
+            cm.envoyerTableauScores();
+            cm.envoyerScorePerso();
+            cm.envoyerNumeroPhase(phase);
+            cm.envoyerTimerPhase(timer);
+            cm.envoyerNbRound(nbRound);
+        }
+
+        for(ClientManager cm : mSalle.getPlayers()){
+            cm.envoyerTableauScores();
+            cm.envoyerScorePerso();
+            cm.envoyerNumeroPhase(phase);
+            cm.envoyerTimerPhase(timer);
+            cm.envoyerNbRound(nbRound);
         }
     }
 

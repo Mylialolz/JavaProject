@@ -121,12 +121,6 @@
                   <hspacer id="7ed73">
                     <constraints/>
                   </hspacer>
-                  <component id="7f6d2" class="javax.swing.JTextField" binding="mTextFieldCheminMeme">
-                    <constraints/>
-                    <properties>
-                      <preferredSize width="75" height="24"/>
-                    </properties>
-                  </component>
                   <component id="b996c" class="javax.swing.JButton" binding="mButtonEnvoyerMeme">
                     <constraints/>
                     <properties>
