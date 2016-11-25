@@ -273,12 +273,11 @@ public class ClientManager implements Runnable {
         return 1;
     }
 
-    synchronized public void diffusion(int i) throws IOException{
+    synchronized public void diffusion(int i, String url) throws IOException{
 
         out.writeUTF(CONSTANTE.DIFFUSION_MEME);
         out.writeInt(i);
-        String copy = mMemeURL;
-        out.writeUTF(copy);
+        out.writeUTF(url);
 
     }
 
@@ -298,11 +297,11 @@ public class ClientManager implements Runnable {
             System.out.println("Diffusion du meme : " + mMemeURL);
 
             for (ClientManager cm : audience) {
-                cm.diffusion(index);
+                cm.diffusion(index, mMemeURL);
             }
 
             for (ClientManager cm : joueur) {
-                cm.diffusion(index);
+                cm.diffusion(index, mMemeURL);
             }
         }
         else {
