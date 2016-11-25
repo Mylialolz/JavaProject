@@ -118,15 +118,6 @@
                       <text value="Quitter partie"/>
                     </properties>
                   </component>
-                  <hspacer id="7ed73">
-                    <constraints/>
-                  </hspacer>
-                  <component id="b996c" class="javax.swing.JButton" binding="mButtonEnvoyerMeme">
-                    <constraints/>
-                    <properties>
-                      <text value="Envoyer meme"/>
-                    </properties>
-                  </component>
                 </children>
               </grid>
             </children>

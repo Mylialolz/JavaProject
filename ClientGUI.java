@@ -149,20 +149,6 @@ public class ClientGUI implements Runnable {
             }
         });
 
-        mButtonEnvoyerMeme.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-
-                    sendMemeURL(mTextFieldCheminMeme.getText());
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-
-            }
-        });
-
         mButtonSearchGeneratorMeme.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -213,6 +199,8 @@ public class ClientGUI implements Runnable {
                     mThread.start();
 
                     mButtonConnectionServer.setEnabled(false);
+
+                    mTabPane.setSelectedIndex(0);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -271,17 +259,6 @@ public class ClientGUI implements Runnable {
             e.printStackTrace();
             return 1;
         }
-    }
-
-    public int sendMemeURL(String chemin) throws IOException {
-
-        if (mConnected == true && mEnJeu == true) {
-            out.writeUTF(CONSTANTE.ENVOYER_MEME);
-            out.writeUTF(chemin);
-            return 0;
-        }
-
-        return 1;
     }
 
     public void envoyerMessageChat(String message){
@@ -533,9 +510,11 @@ public class ClientGUI implements Runnable {
                 default:break;
                 case ClientGUI.MASTER :
                     mLabelIndicatifSalleRole.setText("Vous êtes un joueur : balancez vos memes !");
+                    mTabPane.setSelectedIndex(2);
                     break;
                 case ClientGUI.GUEST :
                     mLabelIndicatifSalleRole.setText("Vous êtes un viewer : balancez vos likes !");
+                    mTabPane.setSelectedIndex(1);
                     break;
             }
         }
