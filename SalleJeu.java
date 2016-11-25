@@ -16,7 +16,7 @@ public class SalleJeu{
     public static final int MAX_ROUNDS = 5;
 
     public static final int NB_MAX_JOUEURS = 6;
-    public static final int WAITINTG_TIME = 90;
+    public static final int WAITINTG_TIME = 20;
 
 
     private ArrayList<ClientManager> joueurs;
@@ -129,10 +129,18 @@ public class SalleJeu{
     }
 
     public void arreterPartie(){
+
         mGameLoop.arreterPartie();
         mGameInfo.arreterPartie();
-        clearAudience();
-        clearPlayers();
+
+        for(ClientManager cm : joueurs){
+            cm.deconnecterClientPartie();
+        }
+
+        for(ClientManager cm : audience){
+            cm.deconnecterClientPartie();
+        }
+
         tempsAvantPartie.start();
     }
 

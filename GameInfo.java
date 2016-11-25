@@ -37,7 +37,7 @@ public class GameInfo implements Runnable {
 
                 Thread.sleep(1000);
 
-                if(mSalle.getNbPlayers() < 1){
+                if(mSalle.getNbPlayers() <= 1){
                     mSalle.arreterPartie();
                 }
 
@@ -47,7 +47,7 @@ public class GameInfo implements Runnable {
         }
     }
 
-    synchronized private void donneesJeu(int phase, int timer, int nbRound) {
+    private void donneesJeu(int phase, int timer, int nbRound) {
         for(ClientManager cm : mSalle.getAudience()){
             cm.envoyerTableauScores();
             cm.envoyerScorePerso();

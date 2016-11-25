@@ -216,12 +216,10 @@ public class ClientManager implements Runnable {
             System.out.print("id_req:" + data + "\n");
             switch(data){
                 default:break;
-
                 case CONSTANTE.CLOSE_CONNECTION :
                     stopThread = 1;
                     out.writeUTF("ok");
                     break;
-
                 case CONSTANTE.CLIENT_SERVER_PSEUDO:
                     String pseudo = in.readUTF();
                     mJoueur = new Joueur(pseudo);
@@ -229,17 +227,14 @@ public class ClientManager implements Runnable {
                     mServeur.getListJoueurs().add(mJoueur);
                     mServeur.newPlayer();
                     break;
-
                 case CONSTANTE.CLIENT_SERVER_CHAT :
                     String m = in.readUTF();
                     String message = mJoueur.getPseudo() + ": " + m;
                     mServeur.newMessage(message, mId);
                     break;
-
                 case CONSTANTE.CLIENT_SERVER_SALLE_JEU :
                     connecterPartie();
                     break;
-
                 case CONSTANTE.QUITTER_PARTIE :
                     deconnecterClientPartie();
                     break;
@@ -263,7 +258,7 @@ public class ClientManager implements Runnable {
         }
     }
 
-    synchronized public int recevoirMeme() throws IOException {
+    public int recevoirMeme() throws IOException {
 
         mMemeURL = null;
         mMemeURL = in.readUTF();
@@ -273,7 +268,7 @@ public class ClientManager implements Runnable {
         return 1;
     }
 
-    synchronized public void diffusion(int i, String url) throws IOException{
+    public void diffusion(int i, String url) throws IOException{
 
         out.writeUTF(CONSTANTE.DIFFUSION_MEME);
         out.writeInt(i);
@@ -281,8 +276,7 @@ public class ClientManager implements Runnable {
 
     }
 
-
-    synchronized public void diffuserMeme() throws IOException{
+    public void diffuserMeme() throws IOException{
 
         if(mMemeURL != null) {
 
@@ -376,9 +370,7 @@ public class ClientManager implements Runnable {
     private void handleClose() {
         try {
 
-
             deconnecterClientPartie();
-
 
             out.close();
             in.close();
@@ -401,7 +393,7 @@ public class ClientManager implements Runnable {
         }
     }
 
-    private void deconnecterClientPartie() {
+    public void deconnecterClientPartie() {
 
         try {
             out.writeUTF(CONSTANTE.VALIDATION_PRESENT_PARTIE);
@@ -430,6 +422,15 @@ public class ClientManager implements Runnable {
         mCanVote = etat;
         out.writeUTF(CONSTANTE.VALIDATION_UPVOTE);
         out.writeBoolean(mCanVote);
+    }
+
+    public void diffusionTheme(String theme) {
+        try {
+            out.writeUTF(CONSTANTE.THEME_ROUND_COURANT);
+            out.writeUTF(theme);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

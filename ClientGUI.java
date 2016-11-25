@@ -261,7 +261,7 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public void envoyerMessageChat(String message){
+    private void envoyerMessageChat(String message){
 
         if(mConnected && !message.matches("")) {
             try {
@@ -274,7 +274,7 @@ public class ClientGUI implements Runnable {
                 String pText = mTextAreaChat.getText();
 
                 if(pText.matches("")) {
-                    mTextAreaChat.setText(mPseudo + ": " + message + "\n");
+                    mTextAreaChat.setText(mPseudo + ": " + message);
                 }
                 else {
                     mTextAreaChat.setText(pText + "\n" + mPseudo + ": " + message);
@@ -486,6 +486,9 @@ public class ClientGUI implements Runnable {
                             System.out.println("id joueur : " + j);
                             updateMeme(j);
                             break;
+                        case CONSTANTE.THEME_ROUND_COURANT :
+                            mLabelThemeRound.setText(in.readUTF());
+                            break;
                     }
                 } catch (SocketException se) {
                     se.printStackTrace();
@@ -525,6 +528,7 @@ public class ClientGUI implements Runnable {
             mLabelIndicatifSalleRole.setText("Vous n'êtes dans aucune salle !");
             mJLabelScore.setText("Score : 0");
             mLabelTimer.setText("Temps restant avant fin du round : 0");
+            mTabPane.setSelectedIndex(0);
         }
     }
 

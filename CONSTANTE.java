@@ -58,4 +58,6 @@ public class CONSTANTE {
 
     public final static String URL_GENERATOR_SEARCH = "http://version1.api.memegenerator.net/Generators_Search";
 
+    public final static String THEME_ROUND_COURANT = "t_r_c";
+
 }

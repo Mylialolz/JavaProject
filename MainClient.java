@@ -12,7 +12,7 @@ public class MainClient {
 
         ClientGUI clientGUI = new ClientGUI(ip, port);
 
-        JFrame frame = new JFrame("meme competitor");
+        JFrame frame = new JFrame("Meme Competitor");
         frame.setContentPane(clientGUI.getMainPanel());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {

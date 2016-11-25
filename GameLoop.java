@@ -13,6 +13,9 @@ public class GameLoop {
     private int indicePhase = 1;
     private int compteurPhase = 0;
 
+
+    private boolean themeDiffuse = false;
+
     private int mRound = 0;
     private Timer t;
 
@@ -21,7 +24,11 @@ public class GameLoop {
         public void actionPerformed(ActionEvent e) {
 
             if (getIndicePhase() == 1) { // preparation des memes
-
+                compteurPhase = 0;
+              /*  if(!themeDiffuse) {
+                    diffuserTheme();
+                    themeDiffuse = true;
+                }*/
                 nouvellePhaseVote(false);
 
                 if (getCompteurPhase() < SalleJeu.TIME_BOUND_P1) {
@@ -31,11 +38,14 @@ public class GameLoop {
                 else {
                     setCompteurPhase(0);
                     setIndicePhase(2);
+                    themeDiffuse = false;
                 }
+
+                compteurPhase++;
             }
 
             if (getIndicePhase() == 2) { // votes pour les memes
-
+                compteurPhase = 0;
                 nouvellePhaseVote(false);
 
                 if (getCompteurPhase() < SalleJeu.TIME_BOUND_P2) {
@@ -47,6 +57,7 @@ public class GameLoop {
                     setIndicePhase(1);
                     mRound++;
                 }
+                compteurPhase++;
             }
 
             if(mRound >= SalleJeu.MAX_ROUNDS)
@@ -74,7 +85,7 @@ public class GameLoop {
         }
     }
 
-    private void nouvellePhaseVote(boolean etat){
+    synchronized private void nouvellePhaseVote(boolean etat){
         try {
             for(ClientManager cm : mSalle.getPlayers())
                 cm.nouveauVote(etat);
@@ -100,6 +111,23 @@ public class GameLoop {
 
     synchronized public void setCompteurPhase(int compteurPhase) {
         this.compteurPhase = compteurPhase;
+    }
+
+    synchronized private void diffuserTheme(){
+        try {
+            String theme = Theme.generateTheme();
+            System.out.println("theme : " + theme);
+            if(theme == null)
+                theme = "ERROR";
+
+            for (ClientManager cm : mSalle.getPlayers())
+                cm.diffusionTheme(theme);
+            for (ClientManager cm : mSalle.getAudience())
+                cm.diffusionTheme(theme);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     synchronized public int getNumRound(){
