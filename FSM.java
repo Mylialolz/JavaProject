@@ -33,7 +33,7 @@ public class FSM {
            case 2 : // STATE DISPLAY GAME SCORES
                break;
            }
-       return currentState; // A retirer si on met le timer dans la FSM
+       return timerOrder; // A retirer si on met le timer dans la FSM
    }
 
 
