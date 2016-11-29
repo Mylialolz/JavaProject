@@ -173,6 +173,12 @@
             <properties/>
             <border type="none"/>
             <children>
+              <component id="a521e" class="javax.swing.JLabel" binding="mLabelPhase">
+                <constraints/>
+                <properties>
+                  <text value="Label"/>
+                </properties>
+              </component>
               <component id="e31b3" class="javax.swing.JLabel" binding="mLabelTimer">
                 <constraints/>
                 <properties>

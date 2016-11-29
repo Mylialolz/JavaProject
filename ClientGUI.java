@@ -86,6 +86,7 @@ public class ClientGUI implements Runnable {
     private JButton mButtonPrecedentGenerator;
     private JLabel mLabelIndicationMemeGeneratorSearch;
     private JPanel mMainPaneSearchGenerator;
+    private JLabel mLabelPhase;
     private JList mJListSalleJeu;
     private GridLayout mGridMemeLayout;
     private GridLayout mGridGeneratorSearchLayout;
@@ -455,17 +456,17 @@ public class ClientGUI implements Runnable {
                                 mJLabelScore.setText("Score : " + score);
                             break;
                         case CONSTANTE.TIMER_PHASE_JEU :
-                            final int time = Integer.parseInt(in.readUTF());
                             final int bound = Integer.parseInt(in.readUTF());
+                            final int time = Integer.parseInt(in.readUTF());
                             mLabelTimer.setText("Temps avant la fin du round : " + time + "/" + bound);
                             break;
                         case CONSTANTE.PHASE_JEU :
                             final int phase = Integer.parseInt(in.readUTF());
                             if(phase == 1) {
-                                mLabelIndicatifSalleRole.setText("Phase 1 : les joueurs conçoivent leur meme !");
+                                mLabelPhase.setText("Phase 1 : les joueurs conçoivent leur meme !");
                             }
                             if (phase == 2){
-                                mLabelIndicatifSalleRole.setText("Phase 2 : l'audience vote !");
+                                mLabelPhase.setText("Phase 2 : tout le monde vote !");
                             }
                             break;
                         case CONSTANTE.NB_ROUND_RESTANTS:
@@ -479,6 +480,10 @@ public class ClientGUI implements Runnable {
                             break;
                         case CONSTANTE.VALIDATION_UPVOTE:
                             mCanVote = in.readBoolean();
+                            if(mCanVote)
+                                mLabelIndicatifSalleRole.setText("Vous pouvez voter!");
+                            else
+                                mLabelIndicatifSalleRole.setText("Vous ne pouvez pas encore voter!");
                             break;
                         case CONSTANTE.DIFFUSION_MEME :
                             System.out.println("Diffusion");

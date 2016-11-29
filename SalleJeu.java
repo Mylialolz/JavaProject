@@ -11,8 +11,6 @@ import java.util.concurrent.Semaphore;
 public class SalleJeu{
 
 
-    public static final int TIME_BOUND_P1 = 15;
-    public static final int TIME_BOUND_P2 = 15;
     public static final int MAX_ROUNDS = 5;
 
     public static final int NB_MAX_JOUEURS = 6;
@@ -22,8 +20,7 @@ public class SalleJeu{
     private ArrayList<ClientManager> joueurs;
     private ArrayList<ClientManager> audience;
 
-    private GameLoop mGameLoop = new GameLoop(this);
-    private GameInfo mGameInfo = new GameInfo(this);
+    private FSM fsm;
 
     private Timer tempsAvantPartie;
     private int compteur = 0;
@@ -72,6 +69,7 @@ public class SalleJeu{
         audience = new ArrayList<>();
         tempsAvantPartie = new Timer(850, task);
         tempsAvantPartie.start();
+        fsm = new FSM(this);
     }
 
     synchronized public int addPlayers(ClientManager cm){
@@ -114,24 +112,16 @@ public class SalleJeu{
 
     synchronized public int getNbAudience(){return audience.size();}
 
-    synchronized public int getGamePhase(){return mGameLoop.getIndicePhase();}
-
-    synchronized public int getTimeInPhase(){return mGameLoop.getCompteurPhase();}
-
-    synchronized public int getNumRound(){return mGameLoop.getNumRound();}
-
     synchronized public int getTimerAvantNouvellePartie(){return compteur;}
 
     public void lancerPartie(){
         tempsAvantPartie.stop();
-        mGameLoop.demarrerPartie();
-        mGameInfo.demarrerPartie();
+        fsm.demarrerPartie();
     }
 
     public void arreterPartie(){
 
-        mGameLoop.arreterPartie();
-        mGameInfo.arreterPartie();
+        fsm.arreterPartie();
 
         for(ClientManager cm : joueurs){
             cm.deconnecterClientPartie();
@@ -140,6 +130,9 @@ public class SalleJeu{
         for(ClientManager cm : audience){
             cm.deconnecterClientPartie();
         }
+
+        clearPlayers();
+        clearAudience();
 
         tempsAvantPartie.start();
     }

@@ -151,20 +151,13 @@ public class ClientManager implements Runnable {
         }
     }
 
-    public void envoyerTimerPhase(int v){
+    public void envoyerTimerPhase(int v, int r){
         if(mEnJeu == true && mSalleJeu != null) {
             try {
 
                 out.writeUTF(CONSTANTE.TIMER_PHASE_JEU);
+                out.writeUTF("" + r);
                 out.writeUTF("" +  v);
-
-                if(mSalleJeu.getGamePhase() == 1){
-                    out.writeUTF("" + SalleJeu.TIME_BOUND_P1);
-                }
-
-                if(mSalleJeu.getGamePhase() == 2){
-                    out.writeUTF("" + SalleJeu.TIME_BOUND_P2);
-                }
 
             } catch (IOException e) {
                 e.printStackTrace();
