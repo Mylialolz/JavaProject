@@ -10,8 +10,8 @@ import java.util.ArrayList;
 public class FSM {
 
 
-   private final static int TIMER_PHASE_1 = 15;
-    private final static int TIMER_PHASE_2 = 15;
+   private final static int TIMER_PHASE_1 = 90;
+    private final static int TIMER_PHASE_2 = 45;
    private int nbRoundPlayed;
    private int currentState; // Indicates the current state of the FSM
 
@@ -32,10 +32,14 @@ public class FSM {
             if(compteur > TIMER_PHASE_1 && currentState == 0) {
                 Machine();
                 compteur = 0;
+                nouvellePhaseVote(true);
+                donneesJeu(nbRoundPlayed);
             }
             if(compteur > TIMER_PHASE_2 && currentState == 1){
                 Machine();
                 compteur = 0;
+                nouvellePhaseVote(false);
+                donneesJeu(nbRoundPlayed);
             }
 
         }
@@ -44,7 +48,7 @@ public class FSM {
 
    public FSM(SalleJeu salle){
        currentState = 0;
-       nbRoundPlayed = 0;
+       nbRoundPlayed = 1;
        mSalle = salle;
        t = new Timer(1000, task);
    }
@@ -68,7 +72,6 @@ public class FSM {
            case 0 : //STATE POST MEME
                /*CALL THE FUNCTION WHICH HANDLES THE ROUND*/
                currentState = 1;
-               nouvellePhaseVote(true);
                System.out.println("case 0");
                break;
            case 1 : //STATE VOTE
@@ -78,10 +81,8 @@ public class FSM {
                    currentState = 3;
                }
                else{
-                   currentState = 1;
+                   currentState = 0;
                }
-               nouvellePhaseVote(false);
-               donneesJeu(nbRoundPlayed);
                break;
            case 3 :// STATE END
                arreterPartie();
@@ -91,6 +92,18 @@ public class FSM {
    }
 
     private void nouvellePhaseVote(boolean etat){
+        try {
+            for(ClientManager cm : mSalle.getPlayers())
+                cm.nouveauVote(etat);
+            for(ClientManager cm : mSalle.getAudience())
+                cm.nouveauVote(etat);
+
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    private void nouvellePhaseEnvoieMeme(boolean etat){
         try {
             for(ClientManager cm : mSalle.getPlayers())
                 cm.nouveauVote(etat);

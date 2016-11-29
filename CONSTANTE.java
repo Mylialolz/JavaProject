@@ -60,4 +60,11 @@ public class CONSTANTE {
 
     public final static String THEME_ROUND_COURANT = "t_r_c";
 
+    public final static String UPLOAD_MEME_POSSIBLE = "u_m_p";
+
+    public final static String DEBUT_PARTIE = "d_p";
+
+
+
+
 }
