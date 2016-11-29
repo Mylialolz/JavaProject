@@ -33,6 +33,8 @@ public class ClientManager implements Runnable {
     private ObjectOutputStream oos;
 
     private boolean mCanVote = false;
+    private boolean mCanEnvoyerMeme = false;
+    private boolean mDebutPartie = false;
     private String mMemeURL = null;
 
     public ClientManager(Server s, Socket e, int id){
@@ -415,6 +417,18 @@ public class ClientManager implements Runnable {
         mCanVote = etat;
         out.writeUTF(CONSTANTE.VALIDATION_UPVOTE);
         out.writeBoolean(mCanVote);
+    }
+
+    public void nouveauMeme (boolean etat) throws IOException{
+        mCanEnvoyerMeme = etat;
+        out.writeUTF(CONSTANTE.UPLOAD_MEME_POSSIBLE);
+        out.writeBoolean(mCanEnvoyerMeme);
+    }
+
+    public void nouvellePartie(boolean etat) throws IOException{
+        mDebutPartie= etat;
+        out.writeUTF(CONSTANTE.DEBUT_PARTIE);
+        out.writeBoolean(mDebutPartie);
     }
 
     public void diffusionTheme(String theme) {

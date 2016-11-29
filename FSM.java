@@ -10,8 +10,8 @@ import java.util.ArrayList;
 public class FSM {
 
 
-   private final static int TIMER_PHASE_1 = 90;
-    private final static int TIMER_PHASE_2 = 45;
+   private final static int TIMER_PHASE_1 = 15;
+    private final static int TIMER_PHASE_2 = 15;
    private int nbRoundPlayed;
    private int currentState; // Indicates the current state of the FSM
 
@@ -34,12 +34,15 @@ public class FSM {
                 compteur = 0;
                 nouvellePhaseVote(true);
                 donneesJeu(nbRoundPlayed);
+                nouvellePhaseEnvoieMeme(false);
             }
             if(compteur > TIMER_PHASE_2 && currentState == 1){
                 Machine();
                 compteur = 0;
                 nouvellePhaseVote(false);
                 donneesJeu(nbRoundPlayed);
+                nouvellePhaseEnvoieMeme(true);
+                nouveauTheme();
             }
 
         }
@@ -51,6 +54,7 @@ public class FSM {
        nbRoundPlayed = 1;
        mSalle = salle;
        t = new Timer(1000, task);
+       nouvellePhaseEnvoieMeme(true);
    }
 
     public void arreterPartie(){
@@ -62,6 +66,8 @@ public class FSM {
 
     public void demarrerPartie(){
         if(!t.isRunning()){
+            nouvellePhaseEnvoieMeme(true);
+            nouveauTheme();
             t.start();
         }
     }
@@ -103,12 +109,25 @@ public class FSM {
         }
     }
 
+    private void nouveauTheme(){
+        try {
+            String theme = Theme.generateTheme();
+            for(ClientManager cm : mSalle.getPlayers())
+                cm.diffusionTheme(theme);
+            for(ClientManager cm : mSalle.getAudience())
+                cm.diffusionTheme(theme);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void nouvellePhaseEnvoieMeme(boolean etat){
         try {
             for(ClientManager cm : mSalle.getPlayers())
-                cm.nouveauVote(etat);
+                cm.nouveauMeme(etat);
             for(ClientManager cm : mSalle.getAudience())
-                cm.nouveauVote(etat);
+                cm.nouveauMeme(false);
 
         } catch (IOException e1) {
             e1.printStackTrace();

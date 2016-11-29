@@ -45,6 +45,8 @@ public class ClientGUI implements Runnable {
     private int mCodeType = -1;
     private boolean mEnJeu = false;
     private boolean mCanVote = false;
+    private boolean mUploadMeme = false;
+    private boolean mDebutPartie = false;
 
     DataInputStream in;
     DataOutputStream out;
@@ -492,7 +494,18 @@ public class ClientGUI implements Runnable {
                             updateMeme(j);
                             break;
                         case CONSTANTE.THEME_ROUND_COURANT :
-                            mLabelThemeRound.setText(in.readUTF());
+                            mLabelThemeRound.setText("Thème : " +in.readUTF());
+                            break;
+                        case CONSTANTE.UPLOAD_MEME_POSSIBLE :
+                            mUploadMeme = in.readBoolean();
+                            System.out.println(mUploadMeme);
+                            if(mUploadMeme){
+                                for(int i = 0; i < mMemeToDisplay.size(); i++)
+                                    mMemeToDisplay.get(i).setIcon(null);
+                            }
+                            break;
+                        case CONSTANTE.DEBUT_PARTIE :
+                            mDebutPartie = in.readBoolean();
                             break;
                     }
                 } catch (SocketException se) {
@@ -614,38 +627,46 @@ public class ClientGUI implements Runnable {
 
 
         if(mMemeGeneratorSearchToDisplay.get(i).getIcon() != null) {
-            String[] options = {"Creer Meme", "Annuler"};
-            JPanel panel = new JPanel();
-            panel.add(new JLabel("Upper Text :"));
-            JTextField textFieldUpper = new JTextField(25);
-            panel.add(textFieldUpper);
 
-            panel.add(new JLabel("Lower Text :"));
-            JTextField textFieldLower = new JTextField(25);
-            panel.add(textFieldLower);
+            if(mUploadMeme) {
 
-            int result = JOptionPane.showOptionDialog(null, panel, "Enter a Number",
-                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
-                    null, options, null);
-            if (result == JOptionPane.YES_OPTION) {
 
-                String upperText = textFieldUpper.getText();
-                String lowerText = textFieldLower.getText();
-                String generatorId = mResearchMemeList.get(i).getGeneratorId();
-                String imgId = mResearchMemeList.get(i).getImageId();
+                String[] options = {"Creer Meme", "Annuler"};
+                JPanel panel = new JPanel();
+                panel.add(new JLabel("Upper Text :"));
+                JTextField textFieldUpper = new JTextField(25);
+                panel.add(textFieldUpper);
 
-                Meme meme = new Meme(generatorId, imgId, upperText, lowerText);
-                String memeUrl = meme.getMemeURL();
-                System.out.println("memeUrl : " + memeUrl);
+                panel.add(new JLabel("Lower Text :"));
+                JTextField textFieldLower = new JTextField(25);
+                panel.add(textFieldLower);
 
-                if(mEnJeu && mConnected){
-                    out.writeUTF(CONSTANTE.ENVOYER_MEME);
-                    out.writeUTF(memeUrl);
+                int result = JOptionPane.showOptionDialog(null, panel, "Enter a Number",
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+                        null, options, null);
+                if (result == JOptionPane.YES_OPTION) {
+
+                    String upperText = textFieldUpper.getText();
+                    String lowerText = textFieldLower.getText();
+                    String generatorId = mResearchMemeList.get(i).getGeneratorId();
+                    String imgId = mResearchMemeList.get(i).getImageId();
+
+                    Meme meme = new Meme(generatorId, imgId, upperText, lowerText);
+                    String memeUrl = meme.getMemeURL();
+                    System.out.println("memeUrl : " + memeUrl);
+
+                    if (mEnJeu && mConnected) {
+                        out.writeUTF(CONSTANTE.ENVOYER_MEME);
+                        out.writeUTF(memeUrl);
+                    }
                 }
             }
+            else {
+
+                final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Impossible d'envoyer un meme pour le moment !",
+                        "Erreur", JOptionPane.YES_NO_OPTION);
+            }
         }
-
-
     }
 
     public void envoyerVote(int i) {
