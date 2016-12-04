@@ -659,6 +659,20 @@ public class ClientGUI implements Runnable {
                         out.writeUTF(CONSTANTE.ENVOYER_MEME);
                         out.writeUTF(memeUrl);
                     }
+                    else  {
+                        JFrame fenetre = new JFrame();
+                        fenetre.setTitle("Aperçu de votre Meme");
+                        fenetre.setSize(400, 400);
+                        fenetre.setResizable(false);
+                        fenetre.setLocationRelativeTo(null);
+                        Image memeImg = UrlHandler.getImageFromURL(memeUrl);
+                        ImageIcon memeIcon = new ImageIcon(memeImg);
+                        JLabel background = new JLabel();
+                        background.setIcon(memeIcon);
+                        fenetre.add(background);
+                        background.setLayout(new FlowLayout());
+                        fenetre.setVisible(true);
+                    }
                 }
             }
             else {
