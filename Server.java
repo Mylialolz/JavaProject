@@ -15,7 +15,7 @@ public class Server {
 
     public static final int NEW_PLAYER = 1;
     public static final int NEW_CHAT_MESSAGE = 2;
-
+    private static Server instance = null;
     private ServerSocket mServerSocket;
     private int mCodeStopServeur = 0;
     private ArrayList<Socket> mListClient;
@@ -26,7 +26,14 @@ public class Server {
 
     private int compteur = 0;
 
-    public Server(){
+    public static Server getInstance() {
+        if(instance == null) {
+            instance = new Server();
+        }
+        return instance;
+    }
+
+    private Server(){
         mListClient = new ArrayList<>();
         mListJoueurs = new ArrayList<>();
         mManagers = new ArrayList<>();

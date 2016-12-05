@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import com.google.gson.*;
 
@@ -77,7 +78,14 @@ public class Meme {
     private String createMeme(){
 
         String requestedURL = CONSTANTE.URL_INSTANCE_CREATE + "?username=" + CONSTANTE.USERNAME + "&password=" + CONSTANTE.PASSWORD + "&languageCode=" + CONSTANTE.LANGUAGE_CODE
-                            + "&generatorID=" + generatorID + "&imageID=" + imageID + "&text0=" + text0 + "&text1=" + text1;
+                + "&generatorID=" + generatorID + "&imageID=" + imageID;
+
+        try {
+             requestedURL += "&text0=" +  URLEncoder.encode(text0, "UTF-8") + "&text1=" + URLEncoder.encode(text1, "UTF-8");
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         return requestedURL;
     }
 

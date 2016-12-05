@@ -20,7 +20,7 @@ public class Main {
         final int port = 1234;
         final String ip = "localhost";
 
-        Server server = new Server();
+        Server server = Server.getInstance();
         server.demarrerServeur(port);
 
         server.arreterServeur();
