@@ -15,6 +15,8 @@ public class ClientGUI implements Runnable {
     public final static int GUEST = 0;
     public final static int MASTER = 1;
 
+    private static ClientGUI instance = null;
+
     private JPanel panneauBot;
 
     //private ArrayList<Joueur> mArrayPlayers;
@@ -88,8 +90,15 @@ public class ClientGUI implements Runnable {
     private double width;
     private double height;
 
+    public static ClientGUI getInstance(String ip, int port) {
+        if(instance == null) {
+            instance = new ClientGUI(ip,port);
+        }
+        return instance;
+    }
 
-    public ClientGUI(String ip, int port) {
+
+    private ClientGUI(String ip, int port) {
         mIp = ip;
         mPort = port;
         setConnected(false);
