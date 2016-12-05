@@ -1,14 +1,7 @@
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
-import sun.rmi.server.Activation$ActivationSystemImpl_Stub;
-
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
-import java.nio.file.Files;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -49,7 +42,7 @@ public class ClientGUI implements Runnable {
     private boolean mDebutPartie = false;
 
     DataInputStream in;
-    DataOutputStream out;
+    private DataOutputStream out;
     ObjectInputStream input;
 
     private JLabel messageTop;
@@ -99,7 +92,7 @@ public class ClientGUI implements Runnable {
     public ClientGUI(String ip, int port) {
         mIp = ip;
         mPort = port;
-        mConnected = false;
+        setConnected(false);
         mThread = new Thread(this);
 
         mTabPane.setTitleAt(0, "Chat");
@@ -184,19 +177,19 @@ public class ClientGUI implements Runnable {
 
     public void connect() {
         try {
-            if (mConnected == false) {
+            if (isConnected() == false) {
 
                 mSocket = new Socket(mIp, mPort);
 
                 try {
                     in = new DataInputStream(mSocket.getInputStream());
-                    out = new DataOutputStream(mSocket.getOutputStream());
+                    setOut(new DataOutputStream(mSocket.getOutputStream()));
                     input = new ObjectInputStream(mSocket.getInputStream());
 
-                    out.writeUTF(CONSTANTE.CLIENT_SERVER_PSEUDO);
-                    out.writeUTF(mPseudo);
+                    getOut().writeUTF(CONSTANTE.CLIENT_SERVER_PSEUDO);
+                    getOut().writeUTF(mPseudo);
 
-                    mConnected = true;
+                    setConnected(true);
                     messageTop.setText("Vous êtes connecté.");
 
                     mThread.start();
@@ -212,7 +205,7 @@ public class ClientGUI implements Runnable {
 
         }catch (IOException e) {
             e.printStackTrace();
-            mConnected = false;
+            setConnected(false);
             messageTop.setText("Vous n'êtes pas connecté.");
         }
 
@@ -246,13 +239,13 @@ public class ClientGUI implements Runnable {
     public int disconnect() {
         try {
 
-            if(mConnected) {
+            if(isConnected()) {
                 System.out.println("Disconnecting...");
-                out.writeUTF(CONSTANTE.CLIENT_SERVER_STOP);
-                out.writeUTF("stop");
+                getOut().writeUTF(CONSTANTE.CLIENT_SERVER_STOP);
+                getOut().writeUTF("stop");
                 in.close();
                 input.close();
-                out.close();
+                getOut().close();
                 mSocket.close();
 
                 mButtonConnectionServer.setEnabled(true);
@@ -266,13 +259,13 @@ public class ClientGUI implements Runnable {
 
     private void envoyerMessageChat(String message){
 
-        if(mConnected && !message.matches("")) {
+        if(isConnected() && !message.matches("")) {
             try {
 
                 System.out.println("Envoi message dans le chat...");
 
-                out.writeUTF(CONSTANTE.CLIENT_SERVER_CHAT);
-                out.writeUTF(message);
+                getOut().writeUTF(CONSTANTE.CLIENT_SERVER_CHAT);
+                getOut().writeUTF(message);
 
                 String pText = mTextAreaChat.getText();
 
@@ -312,7 +305,7 @@ public class ClientGUI implements Runnable {
 
     public void setAudienceAndPlayers() throws IOException, ClassNotFoundException{
 
-        if(mEnJeu == true && mConnected == true) {
+        if(isEnJeu() == true && isConnected() == true) {
 
             ArrayList<String> array = (ArrayList<String>) input.readObject();
             mLabelNbAudience.setText(array.get(0));
@@ -324,11 +317,11 @@ public class ClientGUI implements Runnable {
 
     public void trouverSalleJeu(int code){
 
-        if(mEnJeu == false && mConnected == true) {
+        if(isEnJeu() == false && isConnected() == true) {
 
             try {
-                out.writeUTF(CONSTANTE.CLIENT_SERVER_SALLE_JEU);
-                out.write(code);
+                getOut().writeUTF(CONSTANTE.CLIENT_SERVER_SALLE_JEU);
+                getOut().write(code);
 
                 mCodeType = code;
             } catch (IOException e) {
@@ -341,9 +334,9 @@ public class ClientGUI implements Runnable {
     }
 
     public void quitterSalleJeu(){
-        if(mEnJeu == true) {
+        if(isEnJeu() == true) {
             try {
-                out.writeUTF(CONSTANTE.QUITTER_PARTIE);
+                getOut().writeUTF(CONSTANTE.QUITTER_PARTIE);
                 mDefaultlistScore.removeAllElements();
                 mDefaultlistScore.addElement("Aucune salle de jeu");
                 mButtonAccessGameAudience.setEnabled(true);
@@ -359,56 +352,75 @@ public class ClientGUI implements Runnable {
 
     public void updateMeme(int idJoueur) throws IOException {
 
-        if (mEnJeu == true && mConnected == true) {
+        if (isEnJeu() == true && isConnected() == true) {
 
-            final String urlString = in.readUTF();
-            System.out.println("URL : " + urlString);
+            Thread t = new Thread() {
+                public void run(){
 
-            if (urlString != null) {
+                    final String urlString;
+                    try {
+                        urlString = in.readUTF();
+                        System.out.println("URL : " + urlString);
 
-                Image image = UrlHandler.getImageFromURL(urlString);
-                Image scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
-                mMemeToDisplay.get(idJoueur).setIcon(new ImageIcon(scaledImage));
+                        if (urlString != null) {
 
-            }
+                            Image image = UrlHandler.getImageFromURL(urlString);
+                            Image scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
+                            mMemeToDisplay.get(idJoueur).setIcon(new ImageIcon(scaledImage));
+
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
+
         }
     }
 
     private void visualiserMeme(int page){
 
-        mLabelIndicationMemeGeneratorSearch.setText("Chargement en cours ...");
+        Thread t = new Thread() {
+            public void run() {
 
-        String s = mTextFieldGeneratorSearchMeme.getText();
-        final int indexEspace = s.indexOf(' ');
-        if(indexEspace > 0) {
-            s = s.substring(0, indexEspace);
-        }
-        ArrayList<ResearchMemeListe> array = Meme.researchMemes(s, page);
-        mResearchMemeList = array;
+                mLabelIndicationMemeGeneratorSearch.setText("Chargement en cours ...");
 
-        if(array != null){
-            int l = 0;
-            for(int i = 0; i < array.size(); i++){
-               String imageURL = array.get(i).getImageUrl();
-                Image image = null;
-                try {
-                    image = UrlHandler.getImageFromURL(imageURL);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                String s = mTextFieldGeneratorSearchMeme.getText();
+                final int indexEspace = s.indexOf(' ');
+                if(indexEspace > 0) {
+                    s = s.substring(0, indexEspace);
                 }
-                Image scaledImage = null;
-                if(image != null) {
-                    scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
+                ArrayList<ResearchMemeListe> array = Meme.researchMemes(s, page);
+                mResearchMemeList = array;
+
+                if(array != null) {
+                    int l = 0;
+                    for (int i = 0; i < array.size(); i++) {
+                        String imageURL = array.get(i).getImageUrl();
+                        Image image = null;
+                        try {
+                            image = UrlHandler.getImageFromURL(imageURL);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Image scaledImage = null;
+                        if (image != null) {
+                            scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
+                        } else {
+                        }
+                        if (scaledImage != null) {
+                            mMemeGeneratorSearchToDisplay.get(l).setIcon(new ImageIcon(scaledImage));
+                            l++;
+                        }
+                    }
                 }
-                else {
-                }
-                if(scaledImage != null) {
-                    mMemeGeneratorSearchToDisplay.get(l).setIcon(new ImageIcon(scaledImage));
-                    l++;
-                }
+
+                mLabelIndicationMemeGeneratorSearch.setText("Chargement terminé.");
+
             }
-        }
-        mLabelIndicationMemeGeneratorSearch.setText("Chargement terminé.");
+        };
+        t.start();
 
 
     }
@@ -497,15 +509,15 @@ public class ClientGUI implements Runnable {
                             mLabelThemeRound.setText("Thème : " +in.readUTF());
                             break;
                         case CONSTANTE.UPLOAD_MEME_POSSIBLE :
-                            mUploadMeme = in.readBoolean();
-                            System.out.println(mUploadMeme);
-                            if(mUploadMeme){
+                            setUploadMeme(in.readBoolean());
+                            System.out.println(isUploadMeme());
+                            if(isUploadMeme()){
                                 for(int i = 0; i < mMemeToDisplay.size(); i++)
                                     mMemeToDisplay.get(i).setIcon(null);
                             }
                             break;
                         case CONSTANTE.DEBUT_PARTIE :
-                            mDebutPartie = in.readBoolean();
+                            setDebutPartie(in.readBoolean());
                             break;
                     }
                 } catch (SocketException se) {
@@ -523,10 +535,10 @@ public class ClientGUI implements Runnable {
     }
 
     private void gestionCoDecoPartie() throws IOException {
-        mEnJeu = in.readBoolean();
-        mButtonAccessGameAudience.setEnabled(!mEnJeu);
-        mButtonAccessGamePlayer.setEnabled(!mEnJeu);
-        if(mEnJeu){
+        setEnJeu(in.readBoolean());
+        mButtonAccessGameAudience.setEnabled(!isEnJeu());
+        mButtonAccessGamePlayer.setEnabled(!isEnJeu());
+        if(isEnJeu()){
             switch(mCodeType){
                 default:break;
                 case ClientGUI.MASTER :
@@ -623,69 +635,16 @@ public class ClientGUI implements Runnable {
 
     }
 
-    public void creerMeme(int i) throws IOException{
+    public void creerMeme(int i) throws IOException {
 
-
-        if(mMemeGeneratorSearchToDisplay.get(i).getIcon() != null) {
-
-            if(mUploadMeme) {
-
-
-                String[] options = {"Creer Meme", "Annuler"};
-                JPanel panel = new JPanel();
-                panel.add(new JLabel("Upper Text :"));
-                JTextField textFieldUpper = new JTextField(25);
-                panel.add(textFieldUpper);
-
-                panel.add(new JLabel("Lower Text :"));
-                JTextField textFieldLower = new JTextField(25);
-                panel.add(textFieldLower);
-
-                int result = JOptionPane.showOptionDialog(null, panel, "Enter a Number",
-                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
-                        null, options, null);
-                if (result == JOptionPane.YES_OPTION) {
-
-                    String upperText = textFieldUpper.getText();
-                    String lowerText = textFieldLower.getText();
-                    String generatorId = mResearchMemeList.get(i).getGeneratorId();
-                    String imgId = mResearchMemeList.get(i).getImageId();
-
-                    Meme meme = new Meme(generatorId, imgId, upperText, lowerText);
-                    String memeUrl = meme.getMemeURL();
-                    System.out.println("memeUrl : " + memeUrl);
-
-                    if (mEnJeu && mConnected) {
-                        out.writeUTF(CONSTANTE.ENVOYER_MEME);
-                        out.writeUTF(memeUrl);
-                    }
-                    else  {
-                        JFrame fenetre = new JFrame();
-                        fenetre.setTitle("Aperçu de votre Meme");
-                        fenetre.setSize(400, 400);
-                        fenetre.setResizable(false);
-                        fenetre.setLocationRelativeTo(null);
-                        Image memeImg = UrlHandler.getImageFromURL(memeUrl);
-                        ImageIcon memeIcon = new ImageIcon(memeImg);
-                        JLabel background = new JLabel();
-                        background.setIcon(memeIcon);
-                        fenetre.add(background);
-                        background.setLayout(new FlowLayout());
-                        fenetre.setVisible(true);
-                    }
-                }
-            }
-            else {
-
-                final int r = JOptionPane.showConfirmDialog(mPaneMeme, "Impossible d'envoyer un meme pour le moment !",
-                        "Erreur", JOptionPane.YES_NO_OPTION);
-            }
+        if (mMemeGeneratorSearchToDisplay.get(i).getIcon() != null) {
+            new VisualisationMeme(mResearchMemeList, i, this).visualiser();
         }
     }
 
     public void envoyerVote(int i) {
 
-        if (mConnected && mEnJeu) {
+        if (isConnected() && isEnJeu()) {
 
             if(mCanVote && mMemeToDisplay.get(i).getIcon() != null) {
 
@@ -695,8 +654,8 @@ public class ClientGUI implements Runnable {
                 if (r == JOptionPane.YES_OPTION) {
                     try {
 
-                        out.writeUTF(CONSTANTE.ENVOYER_UPVOTE);
-                        out.writeUTF("" + i);
+                        getOut().writeUTF(CONSTANTE.ENVOYER_UPVOTE);
+                        getOut().writeUTF("" + i);
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -712,4 +671,43 @@ public class ClientGUI implements Runnable {
         }
     }
 
+    public boolean isEnJeu() {
+        return mEnJeu;
+    }
+
+    public void setEnJeu(boolean mEnJeu) {
+        this.mEnJeu = mEnJeu;
+    }
+
+    public boolean isUploadMeme() {
+        return mUploadMeme;
+    }
+
+    public void setUploadMeme(boolean mUploadMeme) {
+        this.mUploadMeme = mUploadMeme;
+    }
+
+    public boolean isDebutPartie() {
+        return mDebutPartie;
+    }
+
+    public void setDebutPartie(boolean mDebutPartie) {
+        this.mDebutPartie = mDebutPartie;
+    }
+
+    public DataOutputStream getOut() {
+        return out;
+    }
+
+    public void setOut(DataOutputStream out) {
+        this.out = out;
+    }
+
+    public boolean isConnected() {
+        return mConnected;
+    }
+
+    public void setConnected(boolean mConnected) {
+        this.mConnected = mConnected;
+    }
 }

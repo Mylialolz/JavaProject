@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="VisualisationMeme">
+  <grid id="27dc6" binding="mainPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="b1bb" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="63a33" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="North"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="4550" class="javax.swing.JLabel">
+                <constraints/>
+                <properties>
+                  <text value="Enter the upper text :"/>
+                </properties>
+              </component>
+              <component id="b2bfe" class="javax.swing.JTextField" binding="mTextFieldUpper">
+                <constraints/>
+                <properties>
+                  <columns value="25"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="b970e" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="South"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="7387" class="javax.swing.JLabel">
+                <constraints/>
+                <properties>
+                  <text value="Enter the lower text :"/>
+                </properties>
+              </component>
+              <component id="5be32" class="javax.swing.JTextField" binding="mTextFieldLower">
+                <constraints/>
+                <properties>
+                  <columns value="25"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="f3ca8" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="624e8" class="javax.swing.JButton" binding="mButtonCreerMeme">
+            <constraints/>
+            <properties>
+              <text value="Creer le meme"/>
+            </properties>
+          </component>
+          <component id="21661" class="javax.swing.JButton" binding="mButtonVisualiser">
+            <constraints/>
+            <properties>
+              <text value="Visualiser"/>
+            </properties>
+          </component>
+          <component id="7fecd" class="javax.swing.JButton" binding="mButtonAnnuler">
+            <constraints/>
+            <properties>
+              <text value="Annuler"/>
+            </properties>
+          </component>
+          <component id="95014" class="javax.swing.JLabel" binding="mMessageError">
+            <constraints/>
+            <properties>
+              <text value=""/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="23bdc" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="88546" class="javax.swing.JLabel" binding="mImage">
+            <constraints/>
+            <properties>
+              <text value=""/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
