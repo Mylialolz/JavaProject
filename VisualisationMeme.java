@@ -1,11 +1,15 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Antoine on 05/12/2016.
@@ -38,6 +42,24 @@ public class VisualisationMeme {
                 try {
                     getInputs();
                     boolean ret = envoyerMeme(mClient.isEnJeu(), mClient.isConnected(), mClient.isUploadMeme(), mClient.getOut());
+                    Image memeImg = UrlHandler.getImageFromURL(mMemeUrl);
+                    BufferedImage img = (BufferedImage) memeImg;
+                    if(mTextFieldUpper != null){
+                        String filename = mTextFieldUpper.getText();
+                        filename += ".jpg";
+                        File f = new File("Memes/"+filename);
+                        if(f.exists()){
+                            ImageIO.write(img, "png", f);
+                        }
+                        else{
+                            File dir = new File ("Memes");
+                            dir.mkdirs();
+                            filename += ".jpg";
+                            f = new File("Memes/"+filename);
+                            ImageIO.write(img, "png", f);
+                        }
+                    }
+
                     if(ret)
                         fenetre.dispatchEvent(new WindowEvent(fenetre, WindowEvent.WINDOW_CLOSING));
                 } catch (IOException e1) {
