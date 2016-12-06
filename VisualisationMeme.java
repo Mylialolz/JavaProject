@@ -37,8 +37,9 @@ public class VisualisationMeme {
             public void actionPerformed(ActionEvent e) {
                 try {
                     getInputs();
-                    envoyerMeme(mClient.isEnJeu(), mClient.isConnected(), mClient.isUploadMeme(), mClient.getOut());
-                    fenetre.dispatchEvent(new WindowEvent(fenetre, WindowEvent.WINDOW_CLOSING));
+                    boolean ret = envoyerMeme(mClient.isEnJeu(), mClient.isConnected(), mClient.isUploadMeme(), mClient.getOut());
+                    if(ret)
+                        fenetre.dispatchEvent(new WindowEvent(fenetre, WindowEvent.WINDOW_CLOSING));
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -88,13 +89,15 @@ public class VisualisationMeme {
 
     }
 
-    synchronized private void envoyerMeme(boolean enJeu, boolean connected, boolean upload, DataOutputStream out) throws IOException{
+    synchronized private boolean envoyerMeme(boolean enJeu, boolean connected, boolean upload, DataOutputStream out) throws IOException{
         if (enJeu && connected && upload && mMemeUrl != null) {
             out.writeUTF(CONSTANTE.ENVOYER_MEME);
             out.writeUTF(mMemeUrl);
+            return true;
         }
         else {
             mMessageError.setText("Impossible d'envoyer le meme pour le moment! ");
+            return false;
         }
     }
 

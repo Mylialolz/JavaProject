@@ -41,7 +41,7 @@
               <component id="e1307" class="javax.swing.JLabel" binding="mMessageAvantPartie">
                 <constraints/>
                 <properties>
-                  <text value="Indications sur la partie en cours"/>
+                  <text value=""/>
                 </properties>
               </component>
             </children>
@@ -176,7 +176,7 @@
               <component id="a521e" class="javax.swing.JLabel" binding="mLabelPhase">
                 <constraints/>
                 <properties>
-                  <text value="Label"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="e31b3" class="javax.swing.JLabel" binding="mLabelTimer">
