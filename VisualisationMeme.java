@@ -8,7 +8,10 @@ import java.awt.image.BufferedImage;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -44,21 +47,19 @@ public class VisualisationMeme {
                     boolean ret = envoyerMeme(mClient.isEnJeu(), mClient.isConnected(), mClient.isUploadMeme(), mClient.getOut());
                     Image memeImg = UrlHandler.getImageFromURL(mMemeUrl);
                     BufferedImage img = (BufferedImage) memeImg;
-                    if(mTextFieldUpper != null){
-                        String filename = mTextFieldUpper.getText();
-                        filename += ".jpg";
-                        File f = new File("Memes/"+filename);
-                        if(f.exists()){
-                            ImageIO.write(img, "png", f);
-                        }
-                        else{
-                            File dir = new File ("Memes");
-                            dir.mkdirs();
-                            filename += ".jpg";
-                            f = new File("Memes/"+filename);
-                            ImageIO.write(img, "png", f);
-                        }
+                    String filename = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+                    filename += ".jpg";
+                    File f = new File("Memes/"+filename);
+                    if(f.exists()){
+                        ImageIO.write(img, "jpg", f);
                     }
+                    else{
+                        File dir = new File ("Memes");
+                        dir.mkdirs();
+                        f = new File("Memes/"+filename);
+                        ImageIO.write(img, "jpg", f);
+                        }
+
 
                     if(ret)
                         fenetre.dispatchEvent(new WindowEvent(fenetre, WindowEvent.WINDOW_CLOSING));
