@@ -71,6 +71,11 @@ public class ClientManager implements Runnable {
 
     }
 
+    public void envoyerMeme(String meme) throws IOException{
+        out.writeUTF(CONSTANTE.ENVOYER_MEME);
+        out.writeUTF(meme);
+    }
+
     public void envoyerListeJoueursConnectes(){
 
         try {
@@ -210,7 +215,9 @@ public class ClientManager implements Runnable {
             String data = in.readUTF();
             System.out.print("id_req:" + data + "\n");
             switch(data){
-                default:break;
+                default:
+                    stopThread = 1;
+                    break;
                 case CONSTANTE.CLOSE_CONNECTION :
                     stopThread = 1;
                     out.writeUTF("ok");

@@ -38,6 +38,7 @@ public class VisualisationMeme {
                 try {
                     getInputs();
                     envoyerMeme(mClient.isEnJeu(), mClient.isConnected(), mClient.isUploadMeme(), mClient.getOut());
+                    fenetre.dispatchEvent(new WindowEvent(fenetre, WindowEvent.WINDOW_CLOSING));
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -87,8 +88,7 @@ public class VisualisationMeme {
 
     }
 
-    private void envoyerMeme(boolean enJeu, boolean connected, boolean upload, DataOutputStream out) throws IOException{
-
+    synchronized private void envoyerMeme(boolean enJeu, boolean connected, boolean upload, DataOutputStream out) throws IOException{
         if (enJeu && connected && upload && mMemeUrl != null) {
             out.writeUTF(CONSTANTE.ENVOYER_MEME);
             out.writeUTF(mMemeUrl);
@@ -109,8 +109,7 @@ public class VisualisationMeme {
         mMemeUrl = meme.getMemeURL();
     }
 
-    private void previsualiser()throws IOException{
-
+     private void previsualiser()throws IOException{
         Thread t = new Thread() {
             public void run(){
                 mMessageError.setText("Chargement en cours...");
@@ -124,12 +123,9 @@ public class VisualisationMeme {
                     e.printStackTrace();
                     mMessageError.setText("Erreur pendant le chargement du meme :s");
                 }
-
             }
         };
         t.start();
-
-
     }
 
 

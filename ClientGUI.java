@@ -45,6 +45,7 @@ public class ClientGUI implements Runnable {
 
     DataInputStream in;
     private DataOutputStream out;
+    private DataOutputStream outMeme;
     ObjectInputStream input;
 
     private JLabel messageTop;
@@ -194,6 +195,7 @@ public class ClientGUI implements Runnable {
                     in = new DataInputStream(mSocket.getInputStream());
                     setOut(new DataOutputStream(mSocket.getOutputStream()));
                     input = new ObjectInputStream(mSocket.getInputStream());
+                    outMeme = new DataOutputStream(mSocket.getOutputStream());
 
                     getOut().writeUTF(CONSTANTE.CLIENT_SERVER_PSEUDO);
                     getOut().writeUTF(mPseudo);
@@ -233,7 +235,7 @@ public class ClientGUI implements Runnable {
 
     }
 
-    private void setScoreTab() throws IOException, ClassNotFoundException{
+    synchronized private void setScoreTab() throws IOException, ClassNotFoundException{
 
         mDefaultlistScore.removeAllElements();
 
@@ -266,7 +268,7 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    private void envoyerMessageChat(String message){
+    synchronized private void envoyerMessageChat(String message){
 
         if(isConnected() && !message.matches("")) {
             try {
@@ -312,7 +314,7 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public void setAudienceAndPlayers() throws IOException, ClassNotFoundException{
+    synchronized public void setAudienceAndPlayers() throws IOException, ClassNotFoundException{
 
         if(isEnJeu() == true && isConnected() == true) {
 
@@ -359,25 +361,23 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public void updateMeme(int idJoueur) throws IOException {
+    synchronized public void updateMeme(int idJoueur) throws IOException {
 
         if (isEnJeu() == true && isConnected() == true) {
 
+            final String urlString = in.readUTF();
+
             Thread t = new Thread() {
                 public void run(){
-
-                    final String urlString;
                     try {
-                        urlString = in.readUTF();
-                        System.out.println("URL : " + urlString);
-
                         if (urlString != null) {
-
+                            System.out.println("URL : " + urlString);
                             Image image = UrlHandler.getImageFromURL(urlString);
                             Image scaledImage = image.getScaledInstance((int) width / 6, (int) height / 4, Image.SCALE_SMOOTH);
                             mMemeToDisplay.get(idJoueur).setIcon(new ImageIcon(scaledImage));
-
                         }
+                        else
+                            System.out.println("Url erreur in function updateMeme()");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -651,8 +651,7 @@ public class ClientGUI implements Runnable {
         }
     }
 
-    public void envoyerVote(int i) {
-
+    synchronized public void envoyerVote(int i) {
         if (isConnected() && isEnJeu()) {
 
             if(mCanVote && mMemeToDisplay.get(i).getIcon() != null) {
@@ -718,5 +717,13 @@ public class ClientGUI implements Runnable {
 
     public void setConnected(boolean mConnected) {
         this.mConnected = mConnected;
+    }
+
+    public DataOutputStream getOutMeme() {
+        return outMeme;
+    }
+
+    public void setOutMeme(DataOutputStream outMeme) {
+        this.outMeme = outMeme;
     }
 }
