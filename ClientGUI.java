@@ -121,9 +121,8 @@ public class ClientGUI implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String s = (String)JOptionPane.showInputDialog(
-                        mButtonConnectionServer,
-                        "Entrez votre pseudo",
-                        JOptionPane.QUESTION_MESSAGE);
+                        null,
+                        "Entrez votre pseudo");
                 if ((s != null) && (s.length() > 0)){
                     mPseudo = s;
                 }
