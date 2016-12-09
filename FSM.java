@@ -10,8 +10,8 @@ import java.util.ArrayList;
 public class FSM {
 
 
-   private final static int TIMER_PHASE_1 = 15;
-    private final static int TIMER_PHASE_2 = 15;
+   private final static int TIMER_PHASE_1 = 90;
+    private final static int TIMER_PHASE_2 = 30;
    private int nbRoundPlayed;
    private int currentState; // Indicates the current state of the FSM
 
@@ -83,7 +83,7 @@ public class FSM {
            case 1 : //STATE VOTE
                System.out.println("case 1s");
                nbRoundPlayed ++;
-               if(nbRoundPlayed == 6){
+               if(nbRoundPlayed == 5){
                    currentState = 3;
                }
                else{
