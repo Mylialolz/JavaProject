@@ -121,8 +121,6 @@ public class SalleJeu{
 
     public void arreterPartie(){
 
-        fsm.arreterPartie();
-
         for(ClientManager cm : joueurs){
             cm.deconnecterClientPartie();
         }

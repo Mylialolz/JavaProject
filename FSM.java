@@ -10,8 +10,8 @@ import java.util.ArrayList;
 public class FSM {
 
 
-   private final static int TIMER_PHASE_1 = 2;
-    private final static int TIMER_PHASE_2 = 2;
+   private final static int TIMER_PHASE_1 = 90;
+    private final static int TIMER_PHASE_2 = 35;
    private int nbRoundPlayed;
    private int currentState; // Indicates the current state of the FSM
 
@@ -66,6 +66,8 @@ public class FSM {
 
     public void demarrerPartie(){
         if(!t.isRunning()){
+            compteur = 0;
+            nbRoundPlayed = 1;
             nouvellePhaseEnvoieMeme(true);
             nouveauTheme();
             t.start();
